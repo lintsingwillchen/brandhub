@@ -1,0 +1,35 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: feishu_brandhub
+    volumes:
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://postgres:password@db:5432/feishu_brandhub
+      FEISHU_APP_ID: cli_your_feishu_app_id
+      FEISHU_APP_SECRET: your_feishu_app_secret
+      JWT_SECRET: your_jwt_production_secret
+      OSS_CDN_BASE: https://your-bucket.oss-cn-beijing.aliyuncs.com
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    command: sh -c "npm install express pg jsonwebtoken && node server.js"
+
+volumes:
+  pgdata:
