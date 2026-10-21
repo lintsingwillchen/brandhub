@@ -1,0 +1,3497 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BrandHub · 飞书品牌资产与视觉规范中心</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Inter"', '"Noto Sans SC"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            feishu: {
+              50: '#F0F5FF',
+              100: '#E0EAFF',
+              200: '#C2D6FF',
+              500: '#3370FF',
+              600: '#245BDB',
+              700: '#1D4ED8',
+              900: '#112566',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F5F6F7;
+      color: #1F2329;
+      overflow-x: hidden;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #DEE0E3;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #BBBFC4;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+      50% { transform: scale(1.06) rotate(3deg); opacity: 1; }
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-float {
+      animation: floatSlow 4s ease-in-out infinite;
+    }
+    .animate-glow {
+      animation: pulseGlow 6s ease-in-out infinite;
+    }
+    .feishu-shadow {
+      box-shadow: 0 2px 8px rgba(31, 35, 41, 0.06), 0 1px 2px rgba(31, 35, 41, 0.04);
+    }
+    .feishu-card-hover {
+      transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .feishu-card-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -6px rgba(51, 112, 255, 0.14), 0 4px 10px -2px rgba(31, 35, 41, 0.06);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-feishu-500 selection:text-white">
+
+  <!-- 飞书客户端宿主容器顶栏（模拟运行在飞书桌面端/工作台内部） -->
+  <div class="bg-[#1F2329] text-slate-300 text-[11px] px-4 py-1.5 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-feishu-500/20 text-cyan-300 font-semibold border border-feishu-500/30">
+          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16v16H4V4zm2 4v10h12V8H6z"/></svg>
+          飞书工作台 · 内部自建应用
+        </span>
+        <span class="hidden sm:inline text-slate-400">当前运行环境：飞书客户端免登容器 (Lark H5 WebView)</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <span id="portal-mode-indicator" class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium">当前端：飞书前台（全员可见）</span>
+        <span class="text-slate-500 hidden md:inline">|</span>
+        <span class="text-slate-400 hidden md:inline">右侧下拉框可模拟不同权限员工打开飞书的效果</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 顶部飞书工作台免登导航栏（前后台严格隔离） -->
+  <header id="app-main-header" class="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-slate-200/80 transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="h-16 flex items-center justify-between gap-3">
+        <!-- 左侧：飞书应用标识 + 前台/后台独立导航 -->
+        <div class="flex items-center gap-4 lg:gap-7 min-w-0">
+          <button type="button" onclick="enterFrontendPortal()" class="flex items-center gap-2.5 text-left group focus:outline-none">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-feishu-500 via-indigo-600 to-cyan-500 flex items-center justify-center text-white shadow-sm group-hover:scale-105 transition">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="truncate">
+              <div class="flex items-center gap-1.5">
+                <span class="font-bold text-slate-900 text-base tracking-tight">BrandHub</span>
+                <span id="header-portal-badge" class="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium bg-feishu-50 text-feishu-600 rounded border border-feishu-200">飞书工作台应用</span>
+              </div>
+              <p class="text-[11px] text-slate-500 hidden sm:block">企业品牌设计资产与视觉规范中心</p>
+            </div>
+          </button>
+
+          <!-- 【前台导航栏】仅展示「首页推荐」和「素材中心」，绝不暴露后台看板与管理中心 -->
+          <nav id="frontend-nav" class="hidden md:flex items-center gap-1 bg-slate-100/80 p-1 rounded-xl border border-slate-200/60" aria-label="前台主导航">
+            <button type="button" id="nav-home" onclick="switchView('home')" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 bg-white text-feishu-600 shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span>首页推荐</span>
+            </button>
+            <button type="button" id="nav-library" onclick="switchView('library')" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              <span>素材中心</span>
+              <span id="nav-library-count" class="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-200/80 text-slate-700 font-semibold">11</span>
+            </button>
+          </nav>
+
+          <!-- 【后台专属导航栏】仅在管理员/维护员进入「管理后台」后显示，前台完全不可见 -->
+          <nav id="backend-nav" class="hidden items-center gap-1 bg-indigo-950/90 p-1 rounded-xl border border-indigo-700/50 text-white" aria-label="后台管理导航">
+            <button type="button" id="nav-admin" onclick="switchView('admin')" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>素材库后台管理</span>
+            </button>
+            <button type="button" id="nav-analytics" onclick="switchView('analytics')" class="px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-indigo-200 hover:text-white">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span>下载分析看板</span>
+            </button>
+          </nav>
+        </div>
+
+        <!-- 右侧：前台批量下载篮 + 前后台切换入口（仅管理员/维护员可见） + 飞书免登账户信息 -->
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          <!-- 批量下载篮（前台显示） -->
+          <button type="button" id="header-cart-btn" onclick="openCartModal()" class="relative p-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition" title="批量下载篮">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+            </svg>
+            <span id="cart-badge" class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-feishu-500 text-white text-[11px] font-bold flex items-center justify-center">0</span>
+          </button>
+
+          <!-- 后台快捷发布按钮（仅在后台模式且有权限时展示） -->
+          <button type="button" id="header-upload-btn" onclick="openAssetModal('folder')" class="hidden items-center gap-1.5 px-3 py-2 rounded-xl bg-feishu-500 hover:bg-feishu-600 text-white text-xs font-semibold shadow-sm transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+            <span>发布/链接素材</span>
+          </button>
+
+          <!-- 【前后台切换核心入口】普通员工完全隐藏此按钮，仅管理员和内容维护员可见 -->
+          <button type="button" id="btn-portal-switch" onclick="togglePortalMode()" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-sm transition">
+            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span id="btn-portal-switch-label">进入管理后台</span>
+          </button>
+
+          <!-- 飞书免登账号切换与状态卡 -->
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200/90 rounded-xl p-1 pl-2">
+            <button type="button" onclick="openFeishuProfileModal()" class="flex items-center gap-2 text-left hover:opacity-90 transition" title="点击查看飞书免登账户详情与 OAuth 载荷">
+              <div id="current-user-avatar" class="w-7 h-7 rounded-full bg-feishu-500 text-white text-xs font-bold flex items-center justify-center shrink-0">林</div>
+              <div class="hidden lg:block leading-tight">
+                <div class="flex items-center gap-1">
+                  <span id="current-user-name" class="text-xs font-semibold text-slate-800">林晓</span>
+                  <span id="current-user-role-badge" class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-700 font-medium">管理员</span>
+                </div>
+                <div class="flex items-center gap-1 text-[10px] text-emerald-600 font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span id="current-user-dept">品牌与创意部 · 飞书免登</span>
+                </div>
+              </div>
+            </button>
+            <select id="user-switcher" onchange="handleUserSwitch(this.value)" aria-label="切换模拟飞书免登用户" class="text-xs bg-white border border-slate-200 rounded-lg px-2 py-1 text-slate-700 font-medium focus:outline-none focus:ring-2 focus:ring-feishu-500 cursor-pointer">
+              <option value="u_admin">飞书账号：林晓 (管理员)</option>
+              <option value="u_maintainer">飞书账号：陈默 (内容维护员)</option>
+              <option value="u_marketing">飞书账号：王梓轩 (普通员工-仅前台)</option>
+              <option value="u_growth">飞书账号：赵敏 (普通员工-仅前台)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 移动端次级导航栏（同样按前后台模式严格隔离） -->
+      <div id="mobile-frontend-nav" class="flex md:hidden items-center justify-around py-2 border-t border-slate-100 gap-1 overflow-x-auto">
+        <button type="button" id="m-nav-home" onclick="switchView('home')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-medium text-center bg-feishu-50 text-feishu-600">首页推荐</button>
+        <button type="button" id="m-nav-library" onclick="switchView('library')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-medium text-center text-slate-600">素材中心</button>
+      </div>
+      <div id="mobile-backend-nav" class="hidden md:hidden items-center justify-around py-2 border-t border-slate-100 gap-1 overflow-x-auto">
+        <button type="button" id="m-nav-admin" onclick="switchView('admin')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-medium text-center bg-indigo-50 text-indigo-700">后台管理</button>
+        <button type="button" id="m-nav-analytics" onclick="switchView('analytics')" class="flex-1 py-1.5 px-2 rounded-lg text-xs font-medium text-center text-slate-600">数据看板</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主体内容容器 -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- ==================== 视图 1：首页推荐 (HOME) ==================== -->
+    <section id="view-home" class="space-y-7">
+      <!-- 顶部 Hero：最新品牌视觉焕新推荐 + 飞书免登欢迎语 -->
+      <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-slate-900 via-feishu-900 to-indigo-950 text-white p-6 sm:p-8 lg:p-10 shadow-lg border border-white/10">
+        <!-- 装饰几何背景 SVG -->
+        <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+          <svg class="w-full h-full" viewBox="0 0 1200 400" fill="none">
+            <circle cx="1020" cy="90" r="220" fill="url(#heroGrad1)" />
+            <circle cx="820" cy="340" r="180" fill="url(#heroGrad2)" />
+            <path d="M650 0L950 400M780 0L1080 400M910 0L1210 400" stroke="rgba(255,255,255,0.08)" stroke-width="2"/>
+            <defs>
+              <radialGradient id="heroGrad1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1020 90) rotate(90) scale(220)">
+                <stop stop-color="#3370FF"/>
+                <stop offset="1" stop-color="#3370FF" stop-opacity="0"/>
+              </radialGradient>
+              <radialGradient id="heroGrad2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(820 340) rotate(90) scale(180)">
+                <stop stop-color="#06B6D4"/>
+                <stop offset="1" stop-color="#06B6D4" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+          </svg>
+        </div>
+
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-7 space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur border border-white/15 text-xs font-medium text-cyan-200">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span id="hero-greeting">飞书免登已就绪 · 欢迎回来，林晓（品牌与创意部）</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-tight">
+              2026 品牌视觉焕新 3.0 <br class="hidden sm:inline" />
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-200">全场景设计资产与办公规范库</span>
+            </h1>
+            <p class="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+              无需额外注册账号，直接通过飞书组织架构身份免登调用。一站式查找并下载官方最新<strong>设计素材、演示与海报模板、品牌 VI 规范、4K 品牌视频及矢量图形</strong>，所有使用记录自动归档统计。
+            </p>
+
+            <!-- 首页快速搜索框 -->
+            <div class="pt-1 flex flex-col sm:flex-row gap-2.5 max-w-xl">
+              <div class="relative flex-1">
+                <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <input id="home-quick-search" type="text" onkeydown="if(event.key==='Enter'){jumpToLibraryWithSearch(this.value)}" placeholder="搜索 Logo、PPT母版、VI规范、宣传片、图标..." class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/95 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-400 shadow-sm" />
+              </div>
+              <button type="button" onclick="jumpToLibraryWithSearch(document.getElementById('home-quick-search').value)" class="px-5 py-2.5 rounded-xl bg-feishu-500 hover:bg-feishu-600 text-white font-semibold text-sm shadow-sm transition shrink-0">
+                立即查找素材
+              </button>
+            </div>
+
+            <!-- 热门搜索词 -->
+            <div class="flex flex-wrap items-center gap-2 text-xs text-slate-300 pt-1">
+              <span class="text-slate-400">热门查找：</span>
+              <button type="button" onclick="jumpToLibraryWithSearch('Logo')" class="px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 transition">标准 Logo 矢量包</button>
+              <button type="button" onclick="jumpToLibraryWithSearch('PPT')" class="px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 transition">2026 路演 PPT 母版</button>
+              <button type="button" onclick="jumpToLibraryWithSearch('VI')" class="px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 transition">品牌 VI 手册 v3.2</button>
+              <button type="button" onclick="jumpToLibraryWithSearch('片头')" class="px-2.5 py-0.5 rounded-full bg-white/10 hover:bg-white/20 transition">4K 动态 Logo 片头</button>
+            </div>
+          </div>
+
+          <!-- 右侧：核心品牌资产精选预览卡片 -->
+          <div class="lg:col-span-5">
+            <div class="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-4 sm:p-5 space-y-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider bg-amber-400 text-slate-950 rounded-md">TOP 置顶合集</span>
+                  <span class="text-xs text-slate-300">版本 v3.2 · 本周更新</span>
+                </div>
+                <span class="text-xs text-cyan-300 font-medium" id="hero-total-downloads-badge">已累计调用 1,420+ 次</span>
+              </div>
+
+              <!-- 矢量视觉卡片 -->
+              <div class="rounded-xl bg-gradient-to-br from-blue-600/80 via-indigo-700/80 to-slate-900 p-4 border border-white/10 flex items-center justify-between gap-4">
+                <div class="space-y-1.5">
+                  <div class="text-xs font-medium text-cyan-200">Brand Identity 2026</div>
+                  <div class="text-base font-bold text-white">全集团标准 VI 与路演母版全家桶</div>
+                  <div class="text-xs text-slate-300">含 SVG 标志、色板规范、飞书云文档模板</div>
+                </div>
+                <div class="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center shrink-0 animate-float">
+                  <svg class="w-10 h-10 text-cyan-300" viewBox="0 0 48 48" fill="none">
+                    <rect x="6" y="8" width="24" height="24" rx="6" fill="#3370FF" fill-opacity="0.8" stroke="white" stroke-width="2"/>
+                    <circle cx="32" cy="28" r="11" fill="#06B6D4" fill-opacity="0.85" stroke="white" stroke-width="2"/>
+                    <path d="M14 18H22M14 23H19" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="bg-white/5 rounded-xl p-2.5 border border-white/10">
+                  <div id="hero-stat-assets" class="text-lg font-bold text-white">11</div>
+                  <div class="text-[11px] text-slate-300">在架官方素材</div>
+                </div>
+                <div class="bg-white/5 rounded-xl p-2.5 border border-white/10">
+                  <div id="hero-stat-downloads" class="text-lg font-bold text-cyan-300">1,458</div>
+                  <div class="text-[11px] text-slate-300">总下载/外链调用</div>
+                </div>
+                <div class="bg-white/5 rounded-xl p-2.5 border border-white/10">
+                  <div class="text-lg font-bold text-emerald-300">100%</div>
+                  <div class="text-[11px] text-slate-300">飞书免登覆盖</div>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button type="button" onclick="openAssetDetail('ast_vi_2026')" class="flex-1 py-2 px-3 rounded-xl bg-white text-slate-900 hover:bg-slate-100 font-semibold text-xs sm:text-sm transition text-center">
+                  预览 VI 规范 v3.2
+                </button>
+                <button type="button" onclick="triggerAssetDownload('ast_vi_2026')" class="py-2 px-3.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs sm:text-sm transition flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                  <span>直接下载</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 五大核心素材分类快捷导航卡片 -->
+      <div>
+        <div class="flex items-center justify-between mb-3.5">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">五大核心品牌资产专区</h2>
+            <p class="text-xs text-slate-500">按资产类型快速进入对应库，支持源文件下载与飞书云文档一键调用</p>
+          </div>
+          <button type="button" onclick="switchView('library')" class="text-xs font-semibold text-feishu-600 hover:text-feishu-700 flex items-center gap-1">
+            <span>查看全部素材库</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+
+        <div id="home-category-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+          <!-- 由 JS 动态渲染 5 大分类卡片（设计素材、模板、规范、视频、图形） -->
+        </div>
+      </div>
+
+      <!-- 首页推荐：最新上架与重点推荐内容 -->
+      <div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-1.5 h-5 rounded-full bg-feishu-500"></span>
+            <div>
+              <h2 class="text-lg font-bold text-slate-900">最新推荐与置顶素材</h2>
+              <p class="text-xs text-slate-500">由品牌管理员与内容维护员精选推荐的最新上架内容</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 self-start">
+            <button type="button" id="home-tab-featured" onclick="setHomeFeedMode('featured')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-feishu-50 text-feishu-600 transition">精选推荐</button>
+            <button type="button" id="home-tab-latest" onclick="setHomeFeedMode('latest')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">最新上架</button>
+            <button type="button" id="home-tab-popular" onclick="setHomeFeedMode('popular')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition">热门下载</button>
+          </div>
+        </div>
+
+        <div id="home-featured-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- 由 JS 渲染精选/最新素材卡片 -->
+        </div>
+      </div>
+
+      <!-- 品牌标准色值与字体速查栏（点击即可复制色值） -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 feishu-shadow">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-slate-900">品牌标准色板速查 (Brand Color Tokens)</h3>
+              <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">点击色卡一键复制 HEX</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">日常制作飞书文档、演示文稿与宣传长图时，请严格遵循以下官方主辅色规范</p>
+          </div>
+          <button type="button" onclick="openAssetDetail('ast_vi_2026')" class="text-xs font-semibold text-feishu-600 hover:underline self-start sm:self-auto">
+            查阅完整《2026 品牌视觉规范手册》 →
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <button type="button" onclick="copyColorToken('#3370FF', '飞书科技蓝 (Primary Blue)')" class="group text-left rounded-xl p-3 border border-slate-200 hover:border-feishu-500 transition bg-slate-50/60">
+            <div class="h-12 rounded-lg bg-[#3370FF] mb-2.5 shadow-inner flex items-end justify-end p-1.5">
+              <span class="text-[10px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">复制</span>
+            </div>
+            <div class="text-xs font-bold text-slate-800">飞书科技蓝</div>
+            <div class="text-[11px] text-slate-500 font-mono">#3370FF · RGB(51,112,255)</div>
+          </button>
+
+          <button type="button" onclick="copyColorToken('#112566', '深邃星空蓝 (Deep Navy)')" class="group text-left rounded-xl p-3 border border-slate-200 hover:border-feishu-500 transition bg-slate-50/60">
+            <div class="h-12 rounded-lg bg-[#112566] mb-2.5 shadow-inner flex items-end justify-end p-1.5">
+              <span class="text-[10px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">复制</span>
+            </div>
+            <div class="text-xs font-bold text-slate-800">深邃星空蓝</div>
+            <div class="text-[11px] text-slate-500 font-mono">#112566 · RGB(17,37,102)</div>
+          </button>
+
+          <button type="button" onclick="copyColorToken('#00B4D8', '灵动青碧 (Vital Cyan)')" class="group text-left rounded-xl p-3 border border-slate-200 hover:border-feishu-500 transition bg-slate-50/60">
+            <div class="h-12 rounded-lg bg-[#00B4D8] mb-2.5 shadow-inner flex items-end justify-end p-1.5">
+              <span class="text-[10px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">复制</span>
+            </div>
+            <div class="text-xs font-bold text-slate-800">灵动青碧</div>
+            <div class="text-[11px] text-slate-500 font-mono">#00B4D8 · RGB(0,180,216)</div>
+          </button>
+
+          <button type="button" onclick="copyColorToken('#6366F1', '幻彩极光紫 (Aurora Indigo)')" class="group text-left rounded-xl p-3 border border-slate-200 hover:border-feishu-500 transition bg-slate-50/60">
+            <div class="h-12 rounded-lg bg-[#6366F1] mb-2.5 shadow-inner flex items-end justify-end p-1.5">
+              <span class="text-[10px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">复制</span>
+            </div>
+            <div class="text-xs font-bold text-slate-800">幻彩极光紫</div>
+            <div class="text-[11px] text-slate-500 font-mono">#6366F1 · RGB(99,102,241)</div>
+          </button>
+
+          <button type="button" onclick="copyColorToken('#10B981', '生态翠绿 (Eco Emerald)')" class="group text-left rounded-xl p-3 border border-slate-200 hover:border-feishu-500 transition bg-slate-50/60">
+            <div class="h-12 rounded-lg bg-[#10B981] mb-2.5 shadow-inner flex items-end justify-end p-1.5">
+              <span class="text-[10px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">复制</span>
+            </div>
+            <div class="text-xs font-bold text-slate-800">生态翠绿</div>
+            <div class="text-[11px] text-slate-500 font-mono">#10B981 · RGB(16,185,129)</div>
+          </button>
+
+          <button type="button" onclick="copyColorToken('#1F2329', '飞书标准墨黑 (Neutral Ink)')" class="group text-left rounded-xl p-3 border border-slate-200 hover:border-feishu-500 transition bg-slate-50/60">
+            <div class="h-12 rounded-lg bg-[#1F2329] mb-2.5 shadow-inner flex items-end justify-end p-1.5">
+              <span class="text-[10px] text-white/90 bg-black/20 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition">复制</span>
+            </div>
+            <div class="text-xs font-bold text-slate-800">标准墨黑</div>
+            <div class="text-[11px] text-slate-500 font-mono">#1F2329 · RGB(31,35,41)</div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 视图 2：素材中心 (LIBRARY) ==================== -->
+    <section id="view-library" class="hidden space-y-5">
+      <!-- 筛选与检索控制面板 -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-4 sm:p-5 feishu-shadow space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          <div>
+            <h1 class="text-xl font-bold text-slate-900">品牌素材与视觉资产库</h1>
+            <p class="text-xs text-slate-500">支持按分类、关键词、文件格式查找，所有下载与云文档调用均自动绑定当前飞书账户记录</p>
+          </div>
+
+          <!-- 搜索框 + 排序 + 视图切换 -->
+          <div class="flex flex-wrap items-center gap-2">
+            <div class="relative flex-1 sm:w-64">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <input id="lib-search-input" type="text" oninput="renderLibraryView()" placeholder="搜索素材名称、标签、格式..." class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+              <button type="button" onclick="clearLibraryFilters()" class="text-slate-400 hover:text-slate-600 absolute right-2.5 top-1/2 -translate-y-1/2 text-xs" title="清空搜索">✕</button>
+            </div>
+
+            <select id="lib-delivery-filter" onchange="renderLibraryView()" aria-label="按获取方式筛选" class="px-3 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-feishu-500">
+              <option value="all">全部形态 (文件夹/单文件/外链)</option>
+              <option value="folder">📁 素材文件夹 (支持打开/下载全部)</option>
+              <option value="download">📄 单个文件 (立即下载)</option>
+              <option value="link">🔗 外部飞书云文档/Figma链接</option>
+            </select>
+
+            <select id="lib-sort-select" onchange="renderLibraryView()" aria-label="排序方式" class="px-3 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-feishu-500">
+              <option value="newest">最新发布优先</option>
+              <option value="downloads">下载热度最高</option>
+              <option value="title">按名称排序</option>
+            </select>
+
+            <!-- 网格/列表视图切换 -->
+            <div class="inline-flex rounded-xl border border-slate-200 p-0.5 bg-slate-50">
+              <button type="button" id="lib-view-grid" onclick="setLibraryLayout('grid')" class="p-1.5 rounded-lg bg-white text-feishu-600 shadow-sm" title="网格视图">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              </button>
+              <button type="button" id="lib-view-list" onclick="setLibraryLayout('list')" class="p-1.5 rounded-lg text-slate-500 hover:text-slate-800" title="列表视图">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分类胶囊栏 -->
+        <div class="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-slate-100">
+          <div id="lib-category-pills" class="flex flex-wrap items-center gap-1.5">
+            <!-- JS 渲染分类筛选胶囊 -->
+          </div>
+          <div id="lib-result-summary" class="text-xs text-slate-500 font-medium">
+            共找到 11 项已上架素材
+          </div>
+        </div>
+      </div>
+
+      <!-- 素材展示容器 -->
+      <div id="library-assets-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- JS 动态渲染 -->
+      </div>
+    </section>
+
+    <!-- ==================== 视图 3：下载行为视觉化控制面板 (ANALYTICS) ==================== -->
+    <section id="view-analytics" class="hidden space-y-6">
+      <!-- 顶部看板标题与时间段过滤 -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold text-slate-900">下载行为视觉化分析控制面板</h1>
+            <span class="px-2 py-0.5 text-[11px] font-semibold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+              实时埋点已开启
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-1">基于飞书免登用户身份（OpenID + 部门归属）自动记录每一次素材下载与外链访问，辅助品牌团队洞察各部门高频需求</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- 时间范围切换 -->
+          <div class="inline-flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button type="button" id="range-7d" onclick="setAnalyticsRange('7d')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600">近 7 天</button>
+            <button type="button" id="range-30d" onclick="setAnalyticsRange('30d')" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white text-feishu-600 shadow-sm">近 30 天</button>
+            <button type="button" id="range-all" onclick="setAnalyticsRange('all')" class="px-3 py-1 rounded-lg text-xs font-semibold text-slate-600">全部记录</button>
+          </div>
+
+          <button type="button" onclick="simulateTeamDownloads()" class="px-3 py-2 rounded-xl border border-feishu-200 bg-feishu-50 hover:bg-feishu-100 text-feishu-700 text-xs font-semibold transition flex items-center gap-1.5" title="模拟多部门员工并发下载并实时刷新图表">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>模拟团队并发下载 (+5)</span>
+          </button>
+
+          <button type="button" onclick="exportDownloadLogsCSV()" class="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>导出审计报表 (.CSV)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 大核心 KPI 卡片 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>累计下载与外链调用</span>
+            <span class="p-2 rounded-xl bg-feishu-50 text-feishu-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            </span>
+          </div>
+          <div id="kpi-total-downloads" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">1,458</div>
+          <div class="flex items-center gap-1.5 mt-2 text-xs">
+            <span class="text-emerald-600 font-semibold">↑ +18.4%</span>
+            <span class="text-slate-400">较上月同期增长 · 含本次会话实时触发</span>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>免登活跃飞书员工 & 部门</span>
+            <span class="p-2 rounded-xl bg-indigo-50 text-indigo-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </span>
+          </div>
+          <div id="kpi-active-users" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">6 个核心部门</div>
+          <div id="kpi-active-users-sub" class="text-xs text-slate-500 mt-2">
+            最近活跃：<strong class="text-slate-700">市场营销部</strong> 占比最高
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>最高频需求资产分类</span>
+            <span class="p-2 rounded-xl bg-cyan-50 text-cyan-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+            </span>
+          </div>
+          <div id="kpi-top-category" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">办公模板</div>
+          <div id="kpi-top-category-sub" class="text-xs text-slate-500 mt-2">
+            占总下载量 <strong class="text-feishu-600">28.6%</strong> · 路演母版最热
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow">
+          <div class="flex items-center justify-between text-xs text-slate-500 font-medium">
+            <span>素材库上架率 & 外链比</span>
+            <span class="p-2 rounded-xl bg-emerald-50 text-emerald-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </span>
+          </div>
+          <div id="kpi-publish-ratio" class="text-2xl sm:text-3xl font-bold text-slate-900 mt-2">11 / 12 在架</div>
+          <div id="kpi-publish-sub" class="text-xs text-slate-500 mt-2">
+            直接下载 76% · 飞书云文档/Figma 外链 24%
+          </div>
+        </div>
+      </div>
+
+      <!-- 图表区第 1 行：下载趋势折线图 + 五大品类占比环形图 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">素材下载与调用趋势分析</h2>
+              <p class="text-xs text-slate-500">追踪每日直接下载次数与外部云文档/Figma 链接访问量变化</p>
+            </div>
+            <span class="text-xs text-feishu-600 bg-feishu-50 px-2.5 py-1 rounded-lg font-medium">动态实时聚合</span>
+          </div>
+          <div class="relative h-72">
+            <canvas id="chart-download-trend"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-4 bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow">
+          <div class="mb-4">
+            <h2 class="text-base font-bold text-slate-900">五大品类下载分布</h2>
+            <p class="text-xs text-slate-500">设计素材、模板、规范、视频、图形调用占比</p>
+          </div>
+          <div class="relative h-72">
+            <canvas id="chart-category-share"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- 图表区第 2 行：飞书各部门下载活跃度 + 热门下载素材 TOP 排行榜 -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow">
+          <div class="mb-4">
+            <h2 class="text-base font-bold text-slate-900">飞书各部门下载行为活跃度排行</h2>
+            <p class="text-xs text-slate-500">自动读取飞书免登用户的组织架构部门字段进行汇总分析</p>
+          </div>
+          <div class="relative h-72">
+            <canvas id="chart-dept-activity"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow flex flex-col">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">热门下载素材 TOP 6 排行榜</h2>
+              <p class="text-xs text-slate-500">按累计下载量与近期调用热度实时排序</p>
+            </div>
+            <span class="text-xs text-slate-400">点击可预览</span>
+          </div>
+          <div id="analytics-top-assets-list" class="space-y-2.5 flex-1 overflow-y-auto custom-scrollbar">
+            <!-- JS 渲染热门素材排行榜 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 实时全量下载行为审计日志表 -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">全量飞书用户下载行为明细记录 (Audit Logs)</h2>
+            <p class="text-xs text-slate-500">记录每一笔免登用户的下载时间、飞书 OpenID、所属部门、素材名称及获取方式</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <input id="log-search-input" type="text" oninput="renderAuditLogTable()" placeholder="筛选员工姓名、部门或素材..." class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+            <select id="log-category-filter" onchange="renderAuditLogTable()" aria-label="日志分类筛选" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-700">
+              <option value="all">全部素材分类</option>
+              <option value="设计素材">设计素材</option>
+              <option value="模板">模板</option>
+              <option value="规范">规范</option>
+              <option value="视频">视频</option>
+              <option value="图形">图形</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase bg-slate-50/70">
+                <th class="py-2.5 px-3">下载时间</th>
+                <th class="py-2.5 px-3">飞书免登用户 (OpenID)</th>
+                <th class="py-2.5 px-3">所属部门</th>
+                <th class="py-2.5 px-3">调用/下载素材名称</th>
+                <th class="py-2.5 px-3">分类</th>
+                <th class="py-2.5 px-3">动作类型</th>
+                <th class="py-2.5 px-3">飞书客户端</th>
+              </tr>
+            </thead>
+            <tbody id="audit-log-tbody" class="divide-y divide-slate-100 text-xs text-slate-700">
+              <!-- JS 渲染日志明细 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 视图 4：后台素材管理中心 (ADMIN CMS) ==================== -->
+    <section id="view-admin" class="hidden space-y-5">
+      <!-- 权限校验横幅（当切换为普通员工时提示权限受限，支持一键切换回管理员） -->
+      <div id="admin-permission-banner" class="hidden rounded-2xl bg-amber-50 border border-amber-300 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="p-2 rounded-xl bg-amber-100 text-amber-700 shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-amber-900">当前飞书账号为「普通员工」只读预览模式</h3>
+            <p class="text-xs text-amber-800 mt-0.5">仅「管理员 (Admin)」和「内容维护员 (Maintainer)」可执行上传、添加链接、上架、下架或删除操作。您可以一键切换回管理员账号体验完整权限。</p>
+          </div>
+        </div>
+        <button type="button" onclick="handleUserSwitch('u_admin')" class="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold shrink-0 transition">
+          一键切换为：林晓 (管理员)
+        </button>
+      </div>
+
+      <!-- 后台顶部操作栏 -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 p-5 feishu-shadow space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="text-xl font-bold text-slate-900">素材库后台管理中心 (CMS)</h1>
+              <span id="admin-role-indicator" class="px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">完整管理权限</span>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">管理员与内容维护员可在此上传本地素材文件、关联飞书云文档/Figma 外链、控制任意素材上架/下架及首页推荐位</p>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <button type="button" onclick="openFeishuArchitectureModal()" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-feishu-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+              <span>飞书免登与权限配置</span>
+            </button>
+            <button type="button" onclick="openAssetModal('link')" class="px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>+ 添加飞书云文档/外链</span>
+            </button>
+            <button type="button" onclick="openAssetModal('upload')" class="px-3.5 py-2 rounded-xl border border-feishu-200 bg-feishu-50 hover:bg-feishu-100 text-feishu-700 text-xs font-semibold transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span>+ 上传新素材</span>
+            </button>
+            <button type="button" onclick="openAssetModal('folder')" class="px-4 py-2 rounded-xl bg-feishu-500 hover:bg-feishu-600 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+              <span>+ 新建素材文件夹 (多文件合集)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 状态统计与批量操作栏 -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+          <!-- 状态过滤按钮 -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <button type="button" id="admin-filter-all" onclick="setAdminStatusFilter('all')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white">
+              全部素材 (<span id="admin-count-all">12</span>)
+            </button>
+            <button type="button" id="admin-filter-published" onclick="setAdminStatusFilter('published')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">
+              已上架 (<span id="admin-count-published">11</span>)
+            </button>
+            <button type="button" id="admin-filter-unpublished" onclick="setAdminStatusFilter('unpublished')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">
+              已下架/待审 (<span id="admin-count-unpublished">1</span>)
+            </button>
+
+            <select id="admin-cat-filter" onchange="renderAdminTable()" aria-label="后台按分类筛选" class="ml-1 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs bg-white text-slate-700">
+              <option value="all">全部分类</option>
+              <option value="设计素材">设计素材</option>
+              <option value="模板">模板</option>
+              <option value="规范">规范</option>
+              <option value="视频">视频</option>
+              <option value="图形">图形</option>
+            </select>
+
+            <input id="admin-search-input" type="text" oninput="renderAdminTable()" placeholder="搜索后台素材..." class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+          </div>
+
+          <!-- 批量操作按钮组 -->
+          <div class="flex items-center gap-2">
+            <span id="admin-selected-count" class="text-xs text-slate-500">已选 0 项</span>
+            <button type="button" onclick="batchUpdateStatus('published')" class="px-2.5 py-1.5 rounded-lg border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-semibold transition">批量上架</button>
+            <button type="button" onclick="batchUpdateStatus('unpublished')" class="px-2.5 py-1.5 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 text-xs font-semibold transition">批量下架</button>
+            <button type="button" onclick="batchDeleteSelected()" class="px-2.5 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition">批量删除</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 后台素材管理表格 -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 feishu-shadow overflow-hidden">
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-200 text-[11px] font-semibold text-slate-500 uppercase bg-slate-50">
+                <th class="py-3 px-4 w-10">
+                  <input type="checkbox" id="admin-select-all" onchange="toggleAdminSelectAll(this.checked)" aria-label="全选素材" class="rounded border-slate-300 text-feishu-600 focus:ring-feishu-500" />
+                </th>
+                <th class="py-3 px-3">素材信息 & 版本</th>
+                <th class="py-3 px-3">分类</th>
+                <th class="py-3 px-3">交付方式 / 格式</th>
+                <th class="py-3 px-3">上架状态</th>
+                <th class="py-3 px-3">首页推荐</th>
+                <th class="py-3 px-3">累计下载</th>
+                <th class="py-3 px-3">维护人 & 更新日期</th>
+                <th class="py-3 px-4 text-right">管理操作 (上架/下架/编辑/删除)</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-tbody" class="divide-y divide-slate-100 text-xs text-slate-700">
+              <!-- JS 渲染后台管理行 -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== 弹窗 1：素材详情与交互式预览 Modal ==================== -->
+  <div id="modal-asset-detail" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-200 animate-fadeIn">
+      <div id="modal-asset-detail-content">
+        <!-- JS 动态填充详情与预览 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 弹窗 2：上传/链接/编辑素材 Modal ==================== -->
+  <div id="modal-asset-form" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-200 p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h2 id="asset-form-title" class="text-lg font-bold text-slate-900">发布新品牌素材 / 关联外部链接</h2>
+          <p class="text-xs text-slate-500">支持直接上传设计源文件，或关联飞书云文档、飞书幻灯片、Figma 等外部协同链接</p>
+        </div>
+        <button type="button" onclick="closeAssetModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100">✕</button>
+      </div>
+
+      <form id="asset-form" onsubmit="handleAssetFormSubmit(event)" class="space-y-4">
+        <input type="hidden" id="form-asset-id" value="" />
+
+        <!-- 交付方式选择：素材文件夹 (多文件) vs 单文件上传 vs 外部链接 -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1.5">素材卡片类型（决定前台卡片显示「打开文件夹+下载全部」还是「立即下载」）</label>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <button type="button" id="mode-btn-folder" onclick="setFormDeliveryMode('folder')" class="py-2.5 px-3 rounded-xl border-2 border-feishu-500 bg-feishu-50 text-feishu-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+              <span>📁 素材文件夹 (下载全部/打开单下)</span>
+            </button>
+            <button type="button" id="mode-btn-upload" onclick="setFormDeliveryMode('download')" class="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span>上传本地文件包 (支持直接下载)</span>
+            </button>
+            <button type="button" id="mode-btn-link" onclick="setFormDeliveryMode('link')" class="py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>关联外部链接 (飞书云文档 / Figma)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 本地文件拖拽选择器 (支持多选批量放入文件夹) -->
+        <div id="form-upload-box" class="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50/70 p-4 text-center hover:border-feishu-500 transition">
+          <input type="file" id="form-file-input" multiple onchange="handleLocalFileSelect(this)" class="hidden" />
+          <label for="form-file-input" class="cursor-pointer flex flex-col items-center space-y-1.5">
+            <div class="w-10 h-10 rounded-full bg-feishu-50 text-feishu-600 flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            </div>
+            <span class="text-xs font-semibold text-feishu-600">点击选择本地文件（支持多选文件直接加入同一素材文件夹）</span>
+            <span id="form-file-Picked-info" class="text-[11px] text-slate-500">支持 SVG, PNG, PSD, PPTX, PDF, MP4, AI 等任意品牌素材格式</span>
+          </label>
+        </div>
+
+        <!-- 素材文件夹内部子文件管理区 (当选择“素材文件夹”时显示) -->
+        <div id="form-folder-files-box" class="rounded-xl border border-feishu-200 bg-feishu-50/40 p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-slate-900">📁 文件夹内包含的子素材清单</div>
+              <p class="text-[11px] text-slate-500">前台用户可选择「下载全部」整包下载，或「打开文件夹」挑选中意的单个文件单独下载</p>
+            </div>
+            <button type="button" onclick="addDraftFolderSubFile()" class="px-2.5 py-1.5 rounded-lg bg-feishu-500 hover:bg-feishu-600 text-white text-xs font-semibold transition">
+              + 添加子文件条目
+            </button>
+          </div>
+          <div id="form-folder-files-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar">
+            <!-- JS 动态渲染文件夹子文件输入行 -->
+          </div>
+        </div>
+
+        <!-- 外部链接输入框 -->
+        <div id="form-link-box" class="hidden">
+          <label for="form-external-url" class="block text-xs font-semibold text-slate-700 mb-1">外部资源链接 (飞书云文档 / 飞书云盘 / Figma URL)</label>
+          <input type="url" id="form-external-url" placeholder="https://sample.feishu.cn/docx/... 或 https://www.figma.com/file/..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label for="form-title" class="block text-xs font-semibold text-slate-700 mb-1">素材名称 <span class="text-rose-500">*</span></label>
+            <input type="text" id="form-title" required placeholder="例如：2026 品牌发布会主视觉 KV 与延展物料包" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+          </div>
+
+          <div>
+            <label for="form-category" class="block text-xs font-semibold text-slate-700 mb-1">所属分类 <span class="text-rose-500">*</span></label>
+            <select id="form-category" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm bg-white focus:outline-none focus:ring-2 focus:ring-feishu-500">
+              <option value="设计素材">设计素材 (KV/摄影/UI组件)</option>
+              <option value="模板">模板 (PPT母版/海报/飞书文档)</option>
+              <option value="规范">规范 (VI手册/用字/联名指南)</option>
+              <option value="视频">视频 (宣传片/动态Logo/片头)</option>
+              <option value="图形">图形 (标准Logo/图标库/辅助纹样)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="form-format" class="block text-xs font-semibold text-slate-700 mb-1">文件格式标识 <span class="text-rose-500">*</span></label>
+            <input type="text" id="form-format" required placeholder="例如：SVG / PNG 或 PPTX / 飞书幻灯片" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+          </div>
+
+          <div>
+            <label for="form-size" class="block text-xs font-semibold text-slate-700 mb-1">文件大小 / 规格</label>
+            <input type="text" id="form-size" placeholder="例如：36.5 MB 或 在线协同链接" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+          </div>
+
+          <div>
+            <label for="form-version" class="block text-xs font-semibold text-slate-700 mb-1">版本号</label>
+            <input type="text" id="form-version" placeholder="例如：v3.2" value="v1.0" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="form-tags" class="block text-xs font-semibold text-slate-700 mb-1">检索标签 (逗号分隔)</label>
+            <input type="text" id="form-tags" placeholder="例如：Logo, 矢量, 发布会, 2026焕新" class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label for="form-desc" class="block text-xs font-semibold text-slate-700 mb-1">素材使用说明与规范提示</label>
+            <textarea id="form-desc" rows="3" placeholder="说明该素材的适用场景、包含的内容清单及版权注意事项..." class="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-feishu-500"></textarea>
+          </div>
+        </div>
+
+        <!-- 上架状态与首页推荐开关 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+          <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer">
+            <div>
+              <div class="text-xs font-bold text-slate-800">立即上架开放下载</div>
+              <div class="text-[11px] text-slate-500">关闭则存为「已下架」仅后台可见</div>
+            </div>
+            <input type="checkbox" id="form-published" checked class="w-4 h-4 rounded text-feishu-600 focus:ring-feishu-500" />
+          </label>
+
+          <label class="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/60 cursor-pointer">
+            <div>
+              <div class="text-xs font-bold text-slate-800">推荐至应用首页</div>
+              <div class="text-[11px] text-slate-500">在首页「最新推荐」专区优先展示</div>
+            </div>
+            <input type="checkbox" id="form-featured" checked class="w-4 h-4 rounded text-feishu-600 focus:ring-feishu-500" />
+          </label>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+          <button type="button" onclick="closeAssetModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-50">取消</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-feishu-500 hover:bg-feishu-600 text-white text-xs sm:text-sm font-semibold shadow-sm transition">保存并同步素材库</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== 弹窗 3：飞书免登账户详情与个人下载记录 Modal ==================== -->
+  <div id="modal-feishu-profile" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <h2 class="text-base font-bold text-slate-900">飞书免登个人账户信息 (OAuth 2.0)</h2>
+        </div>
+        <button type="button" onclick="closeFeishuProfileModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+      <div id="feishu-profile-modal-body" class="space-y-4">
+        <!-- JS 动态渲染当前飞书账号载荷与个人下载历史 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 弹窗 4：飞书开放平台架构与角色权限管理 Modal ==================== -->
+  <div id="modal-feishu-arch" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-200 p-6 space-y-5">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">飞书免登接入规范 & 角色权限配置中心</h2>
+          <p class="text-xs text-slate-500">配置飞书自建应用 OAuth 免登鉴权及「管理员 / 内容维护员」白名单</p>
+        </div>
+        <button type="button" onclick="closeFeishuArchitectureModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+
+      <div class="space-y-4 text-xs">
+        <div class="rounded-xl bg-slate-900 text-slate-100 p-4 font-mono space-y-1.5 overflow-x-auto">
+          <div class="text-cyan-400 font-sans font-semibold text-xs">// 1. 飞书网页应用免登流程 (Lark JSAPI tt.requestAccess)</div>
+          <div>window.h5sdk.ready(() =&gt; {</div>
+          <div class="pl-4">tt.requestAccess({</div>
+          <div class="pl-8">appID: 'cli_a6b8f29e01c8900b',</div>
+          <div class="pl-8">scopeList: ['contact:user.department:readonly'],</div>
+          <div class="pl-8">success: (res) =&gt; fetchUserByCode(res.code) // 换取 open_id、姓名、头像与部门</div>
+          <div class="pl-4">});</div>
+          <div>});</div>
+        </div>
+
+        <div class="border border-slate-200 rounded-xl p-4 space-y-3">
+          <div class="font-bold text-slate-900 text-sm">飞书组织架构角色权限矩阵</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div class="p-3 rounded-xl bg-indigo-50/70 border border-indigo-200">
+              <div class="font-bold text-indigo-900">管理员 (Admin)</div>
+              <div class="text-[11px] text-indigo-700 mt-1">林晓 (品牌与创意部)</div>
+              <div class="text-[11px] text-slate-600 mt-1">拥有全量素材上传、外链、上下架、删除、数据看板导出与权限分配能力。</div>
+            </div>
+            <div class="p-3 rounded-xl bg-cyan-50/70 border border-cyan-200">
+              <div class="font-bold text-cyan-900">内容维护员 (Maintainer)</div>
+              <div class="text-[11px] text-cyan-700 mt-1">陈默 (视觉传达组)</div>
+              <div class="text-[11px] text-slate-600 mt-1">拥有素材上传、外链关联、编辑、上架/下架、首页推荐及查看下载看板权限。</div>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div class="font-bold text-slate-800">普通员工 (Member)</div>
+              <div class="text-[11px] text-slate-600 mt-1">全员免登默认角色</div>
+              <div class="text-[11px] text-slate-600 mt-1">免注册直接浏览首页推荐、检索并下载所有「已上架」素材，自动记录下载行为。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end pt-2 border-t border-slate-100">
+        <button type="button" onclick="closeFeishuArchitectureModal()" class="px-4 py-2 rounded-xl bg-feishu-500 text-white text-xs font-semibold">完成查阅</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 弹窗 5：批量下载篮 Modal ==================== -->
+  <div id="modal-cart" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full max-h-[88vh] overflow-y-auto custom-scrollbar shadow-2xl border border-slate-200 p-6 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">素材批量下载篮</h2>
+          <p class="text-xs text-slate-500">一键打包触发所有已选素材下载，并同步写入飞书后台下载记录</p>
+        </div>
+        <button type="button" onclick="closeCartModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+      <div id="cart-items-container" class="space-y-2.5 max-h-72 overflow-y-auto custom-scrollbar">
+        <!-- JS 渲染已选素材 -->
+      </div>
+      <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+        <button type="button" onclick="clearCart()" class="text-xs text-slate-500 hover:text-rose-600 font-medium">清空下载篮</button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="closeCartModal()" class="px-3.5 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-600">继续挑选</button>
+          <button type="button" onclick="executeBatchDownload()" class="px-4 py-2 rounded-xl bg-feishu-500 hover:bg-feishu-600 text-white text-xs font-semibold shadow-sm transition">一键全部下载并记录</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 弹窗 6：打开素材文件夹内部浏览器 Modal ==================== -->
+  <div id="modal-folder-explorer" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+      <!-- 文件夹弹窗头部 -->
+      <div class="p-5 bg-gradient-to-r from-slate-900 via-feishu-900 to-indigo-950 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-start gap-3.5 min-w-0">
+          <div class="w-11 h-11 rounded-2xl bg-amber-400/20 border border-amber-300/40 text-amber-300 flex items-center justify-center shrink-0">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          </div>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="folder-modal-cat" class="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-white/15 text-cyan-200">图形</span>
+              <span id="folder-modal-stats" class="text-xs text-slate-300">共 6 个子文件 · 总大小 14.2 MB</span>
+            </div>
+            <h2 id="folder-modal-title" class="text-base sm:text-lg font-bold text-white truncate mt-1">素材文件夹名称</h2>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+          <button type="button" id="folder-modal-download-all-btn" onclick="triggerCurrentFolderDownloadAll()" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>下载全部 (整包打包)</span>
+          </button>
+          <button type="button" onclick="closeFolderModal()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-sm">✕</button>
+        </div>
+      </div>
+
+      <!-- 文件夹内部检索与多选工具栏 -->
+      <div class="px-5 py-3 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+        <div class="flex items-center gap-2 flex-1">
+          <div class="relative flex-1 max-w-xs">
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="folder-internal-search" oninput="renderFolderModalFiles()" placeholder="在文件夹内搜索文件名或格式 (如 SVG, PNG)..." class="w-full pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs focus:outline-none focus:ring-2 focus:ring-feishu-500" />
+          </div>
+          <span id="folder-selected-hint" class="text-xs text-slate-500">可点击右侧「单独下载」按需下载单个素材</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="downloadSelectedSubFiles()" class="px-3 py-1.5 rounded-xl border border-feishu-200 bg-feishu-50 hover:bg-feishu-100 text-feishu-700 text-xs font-semibold transition">
+            下载勾选的子文件
+          </button>
+        </div>
+      </div>
+
+      <!-- 文件夹内子文件列表 -->
+      <div id="folder-modal-files-container" class="p-5 overflow-y-auto custom-scrollbar flex-1 grid grid-cols-1 md:grid-cols-2 gap-3.5 bg-slate-50/40">
+        <!-- JS 渲染文件夹内的每个子文件卡片 -->
+      </div>
+
+      <!-- 底部说明 -->
+      <div class="px-5 py-3 bg-white border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <span>提示：无论是「下载全部」还是「单独下载」某个子文件，均自动关联您的飞书账号记入后台数据看板</span>
+        <button type="button" onclick="closeFolderModal()" class="px-4 py-1.5 rounded-xl border border-slate-200 text-slate-700 font-medium hover:bg-slate-50">关闭文件夹</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 全局轻提示 Toast 容器 -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+  <script>
+    // ==================== 1. 飞书免登用户列表 (模拟 tt.requestAccess 返回的组织架构身份) ====================
+    const FEISHU_USERS = {
+      u_admin: {
+        id: 'u_admin',
+        open_id: 'ou_8f92a1c0b3e7109d',
+        union_id: 'on_9182736455aabbcc',
+        name: '林晓',
+        en_name: 'Lin Xiao',
+        avatarText: '林',
+        avatarBg: 'bg-feishu-500',
+        department: '品牌与创意部',
+        jobTitle: '品牌设计总监',
+        role: 'admin',
+        roleLabel: '管理员',
+        roleBadgeClass: 'bg-indigo-100 text-indigo-700',
+        device: '飞书桌面端 macOS'
+      },
+      u_maintainer: {
+        id: 'u_maintainer',
+        open_id: 'ou_4d21e8f9a1c08812',
+        union_id: 'on_5544332211ddeeff',
+        name: '陈默',
+        en_name: 'Chen Mo',
+        avatarText: '陈',
+        avatarBg: 'bg-cyan-600',
+        department: '视觉传达组',
+        jobTitle: '资深视觉设计师',
+        role: 'maintainer',
+        roleLabel: '内容维护员',
+        roleBadgeClass: 'bg-cyan-100 text-cyan-800',
+        device: '飞书桌面端 macOS'
+      },
+      u_marketing: {
+        id: 'u_marketing',
+        open_id: 'ou_7c35b2d4e6f10293',
+        union_id: 'on_7788990011aaccdd',
+        name: '王梓轩',
+        en_name: 'Wang Zixuan',
+        avatarText: '王',
+        avatarBg: 'bg-emerald-600',
+        department: '市场营销部',
+        jobTitle: '高级产品市场经理',
+        role: 'member',
+        roleLabel: '普通员工',
+        roleBadgeClass: 'bg-slate-200 text-slate-700',
+        device: '飞书桌面端 Windows'
+      },
+      u_growth: {
+        id: 'u_growth',
+        open_id: 'ou_1a68f4c9d2b30918',
+        union_id: 'on_3344556677ffeedd',
+        name: '赵敏',
+        en_name: 'Zhao Min',
+        avatarText: '赵',
+        avatarBg: 'bg-amber-600',
+        department: '增长运营部',
+        jobTitle: '新媒体内容运营',
+        role: 'member',
+        roleLabel: '普通员工',
+        roleBadgeClass: 'bg-slate-200 text-slate-700',
+        device: '飞书移动端 iOS'
+      }
+    };
+
+    // 五大核心分类配置
+    const CATEGORIES = [
+      { key: '设计素材', name: '设计素材', sub: 'KV主视觉 / 3D渲染 / UI组件', color: 'from-blue-500 to-indigo-600', badge: 'bg-blue-50 text-blue-700 border-blue-200', chartColor: '#3370FF' },
+      { key: '模板', name: '办公与宣发模板', sub: '路演PPT / 海报 / 飞书文档', color: 'from-indigo-500 to-purple-600', badge: 'bg-indigo-50 text-indigo-700 border-indigo-200', chartColor: '#6366F1' },
+      { key: '规范', name: '品牌视觉规范', sub: 'VI手册 / 色彩字体 / 联名标准', color: 'from-cyan-500 to-teal-600', badge: 'bg-cyan-50 text-cyan-700 border-cyan-200', chartColor: '#06B6D4' },
+      { key: '视频', name: '品牌视频资产', sub: '宣传片 / 动态Logo / 片头包装', color: 'from-rose-500 to-orange-500', badge: 'bg-rose-50 text-rose-700 border-rose-200', chartColor: '#F43F5E' },
+      { key: '图形', name: '矢量图形与标志', sub: '标准Logo / 图标库 / 辅助纹样', color: 'from-emerald-500 to-teal-600', badge: 'bg-emerald-50 text-emerald-700 border-emerald-200', chartColor: '#10B981' }
+    ];
+
+    // 初始 12 项品牌资产数据（支持「素材文件夹(含多个子文件)」与「单文件/外链」双模式）
+    const INITIAL_ASSETS = [
+      {
+        id: 'ast_logo_pack',
+        title: '品牌核心 Logo 全格式标准资产文件夹 (横版/竖版/反白/纯图形)',
+        category: '图形',
+        format: '文件夹 (SVG / AI / PNG)',
+        size: '14.2 MB',
+        version: 'v3.0',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: '',
+        published: true,
+        featured: true,
+        downloads: 418,
+        updatedAt: '2026-10-20',
+        maintainer: '林晓',
+        theme: 'emerald',
+        tags: ['Logo文件夹', '矢量标志', 'SVG', '反白稿', '印刷CMYK'],
+        desc: '将全套品牌标准标志归档于同一素材文件夹内。您既可点击「下载全部」一键打包获取全套格式，也可点击「打开文件夹」按需预览并单独下载横版、竖版或反白透明底单文件。',
+        folderFiles: [
+          { id: 'sub_logo_1', name: '01_品牌主Logo_中英横版_标准科技蓝.svg', format: 'SVG', spec: '矢量无限缩放', size: '420 KB', downloads: 165 },
+          { id: 'sub_logo_2', name: '02_品牌主Logo_中英竖版_标准科技蓝.svg', format: 'SVG', spec: '矢量无限缩放', size: '390 KB', downloads: 98 },
+          { id: 'sub_logo_3', name: '03_品牌主Logo_深色背景反白稿_透明通道.png', format: 'PNG', spec: '4096×1600 px', size: '2.4 MB', downloads: 142 },
+          { id: 'sub_logo_4', name: '04_品牌纯图形符号_飞书工作台圆角图标.svg', format: 'SVG', spec: '1024×1024 px', size: '280 KB', downloads: 89 },
+          { id: 'sub_logo_5', name: '05_品牌全套标志_印刷级CMYK色值源文件.ai', format: 'AI', spec: 'CMYK 300DPI', size: '8.6 MB', downloads: 64 },
+          { id: 'sub_logo_6', name: '06_Logo最小安全间距与禁用规范速查卡.pdf', format: 'PDF', spec: 'A4 单页速查', size: '2.1 MB', downloads: 73 }
+        ]
+      },
+      {
+        id: 'ast_ppt_master',
+        title: '2026 飞书演示文稿 & 对外商业路演 PPT/Keynote 模板文件夹',
+        category: '模板',
+        format: '文件夹 (PPTX / KEY / PDF)',
+        size: '68.0 MB',
+        version: 'v2.6',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: 'https://open.feishu.cn/slides/brand-pitch-deck-2026',
+        published: true,
+        featured: true,
+        downloads: 389,
+        updatedAt: '2026-10-20',
+        maintainer: '陈默',
+        theme: 'indigo',
+        tags: ['PPT文件夹', '路演母版', 'Keynote', '飞书幻灯片', '汇报模板'],
+        desc: '同一文件夹内汇总了对外商业路演、内部季度复盘、产品发布会及深色科技风 4 套标准母版，支持整包下载或打开文件夹单独下载所需模板。',
+        folderFiles: [
+          { id: 'sub_ppt_1', name: '01_2026对外商业路演与客户提案标准母版_16x9.pptx', format: 'PPTX', spec: '16:9 宽屏 (45页)', size: '22.4 MB', downloads: 210 },
+          { id: 'sub_ppt_2', name: '02_飞书内部双月复盘与OKR述职精简模板.pptx', format: 'PPTX', spec: '16:9 宽屏 (24页)', size: '14.8 MB', downloads: 156 },
+          { id: 'sub_ppt_3', name: '03_Apple_Keynote发布会深色极光视觉母版.key', format: 'KEY', spec: '4K 演示级 (36页)', size: '24.6 MB', downloads: 82 },
+          { id: 'sub_ppt_4', name: '04_演示文稿数据图表与商业信息图组件库.pptx', format: 'PPTX', spec: '80+ 可编辑图表', size: '6.2 MB', downloads: 119 }
+        ]
+      },
+      {
+        id: 'ast_vi_2026',
+        title: '2026 品牌视觉识别系统 (VI) 核心规范手册 v3.2 (完整版单文件)',
+        category: '规范',
+        format: 'PDF (高清交互目录版)',
+        size: '28.4 MB',
+        version: 'v3.2',
+        deliveryType: 'download',
+        isFolder: false,
+        externalUrl: 'https://open.feishu.cn/document/brand-vi-guide-2026',
+        published: true,
+        featured: true,
+        downloads: 342,
+        updatedAt: '2026-10-19',
+        maintainer: '林晓',
+        theme: 'cyan',
+        tags: ['VI手册', '品牌规范', '标准色板', '字体规范', '单文件直下'],
+        desc: '全集团最新 3.0 品牌视觉规范总纲 PDF 单文件，涵盖标志制图标准、安全间距、主辅色值（HEX/RGB/CMYK/Pantone）及中英文排版准则，点击「立即下载」直接获取。',
+        folderFiles: []
+      },
+      {
+        id: 'ast_kv_aether',
+        title: 'Aether 3D 流体玻璃态品牌主视觉 KV 渲染素材文件夹',
+        category: '设计素材',
+        format: '文件夹 (PNG / PSD / Blender)',
+        size: '186.5 MB',
+        version: 'v2.1',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: '',
+        published: true,
+        featured: true,
+        downloads: 215,
+        updatedAt: '2026-10-18',
+        maintainer: '陈默',
+        theme: 'blue',
+        tags: ['主视觉文件夹', '3D流体', '玻璃态', '发布会背景', '透明PNG'],
+        desc: '将 2026 年度战役主视觉横版海报、竖版展架、透明背景 3D 玻璃流体元素收纳于同一文件夹，方便设计师打开文件夹挑选单个 3D 元素下载。',
+        folderFiles: [
+          { id: 'sub_kv_1', name: '01_主视觉KV_横版主会场大屏背景_4K.png', format: 'PNG', spec: '3840×2160 px', size: '18.2 MB', downloads: 124 },
+          { id: 'sub_kv_2', name: '02_主视觉KV_竖版易拉宝与手机海报底图.png', format: 'PNG', spec: '2160×3840 px', size: '16.5 MB', downloads: 96 },
+          { id: 'sub_kv_3', name: '03_独立3D元素_流体玻璃圆环_透明通道.png', format: 'PNG', spec: '3000×3000 px', size: '11.4 MB', downloads: 138 },
+          { id: 'sub_kv_4', name: '04_独立3D元素_极光折射多面体_透明通道.png', format: 'PNG', spec: '3000×3000 px', size: '10.8 MB', downloads: 88 },
+          { id: 'sub_kv_5', name: '05_主视觉KV_全分层可编辑源文件.psd', format: 'PSD', spec: 'RGB 分层源文件', size: '129.6 MB', downloads: 67 }
+        ]
+      },
+      {
+        id: 'ast_video_bumper',
+        title: '品牌动态 Logo 演绎片头 & 视频转场包装文件夹 (4K 60fps)',
+        category: '视频',
+        format: '文件夹 (MP4 / MOV / AE)',
+        size: '312.0 MB',
+        version: 'v1.8',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: '',
+        published: true,
+        featured: true,
+        downloads: 176,
+        updatedAt: '2026-10-16',
+        maintainer: '陈默',
+        theme: 'rose',
+        tags: ['视频文件夹', '动态Logo', '转场动画', '字幕条', '4K视频'],
+        desc: '包含深色/浅色 3 秒与 5 秒片头、嘉宾人名字幕条动画、转场音效及 AE 工程文件，可打开文件夹单独下载某一条片头 MP4。',
+        folderFiles: [
+          { id: 'sub_vid_1', name: '01_品牌动态Logo演绎片头_科技蓝浅色版_3s.mp4', format: 'MP4', spec: '4K 60fps H.264', size: '24.5 MB', downloads: 132 },
+          { id: 'sub_vid_2', name: '02_品牌动态Logo演绎片头_深邃星空深色版_5s.mp4', format: 'MP4', spec: '4K 60fps H.264', size: '38.0 MB', downloads: 109 },
+          { id: 'sub_vid_3', name: '03_视频包装_嘉宾姓名条与角标动画_带透明通道.mov', format: 'MOV', spec: 'ProRes 4444 Alpha', size: '96.5 MB', downloads: 74 },
+          { id: 'sub_vid_4', name: '04_片头与转场全套可改字工程文件.aep', format: 'AEP', spec: 'After Effects 2024+', size: '153.0 MB', downloads: 51 }
+        ]
+      },
+      {
+        id: 'ast_ui_figma',
+        title: '企业级产品 UI 视觉组件库与飞书消息卡片设计套件 (云端外链)',
+        category: '设计素材',
+        format: 'Figma 外链 / 飞书设计协同',
+        size: '云端实时同步',
+        version: 'v4.0',
+        deliveryType: 'link',
+        isFolder: false,
+        externalUrl: 'https://www.figma.com/community/file/brandhub-design-system',
+        published: true,
+        featured: true,
+        downloads: 194,
+        updatedAt: '2026-10-20',
+        maintainer: '林晓',
+        theme: 'blue',
+        tags: ['UI组件库', 'Figma外链', '飞书卡片', 'Design Tokens'],
+        desc: '外部协同链接型素材：包含桌面端与移动端全套 Design Tokens、飞书机器人交互卡片模板，点击「打开外链」直达云端并记录访问。',
+        folderFiles: []
+      },
+      {
+        id: 'ast_social_posters',
+        title: '新媒体全渠道宣发海报模板文件夹 (公众号/小红书/活动长图)',
+        category: '模板',
+        format: '文件夹 (PSD / PNG)',
+        size: '68.5 MB',
+        version: 'v1.5',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: '',
+        published: true,
+        featured: false,
+        downloads: 164,
+        updatedAt: '2026-10-14',
+        maintainer: '陈默',
+        theme: 'indigo',
+        tags: ['新媒体文件夹', '小红书配图', '公众号封面', '嘉宾金句卡'],
+        desc: '将公众号首图、小红书多图笔记、峰会邀请函、战报海报归入同一文件夹，运营同学可打开文件夹挑选中意的单张海报模板下载。',
+        folderFiles: [
+          { id: 'sub_soc_1', name: '01_微信公众号头条首图模板_2.35比1(含3款版式).psd', format: 'PSD', spec: '900×383 px', size: '14.2 MB', downloads: 112 },
+          { id: 'sub_soc_2', name: '02_小红书干货图文笔记封面与内页框架(6页套图).psd', format: 'PSD', spec: '1242×1660 px', size: '22.8 MB', downloads: 98 },
+          { id: 'sub_soc_3', name: '03_行业沙龙与直播峰会嘉宾海报竖版模板.psd', format: 'PSD', spec: '1080×1920 px', size: '18.5 MB', downloads: 86 },
+          { id: 'sub_soc_4', name: '04_新品发布倒计时3天_1天宣发九宫格配图.png', format: 'PNG', spec: '2000×2000 px', size: '13.0 MB', downloads: 64 }
+        ]
+      },
+      {
+        id: 'ast_icon_library',
+        title: '品牌定制线性与双色弥散图标库文件夹 (按业务场景分包)',
+        category: '图形',
+        format: '文件夹 (SVG / IconFont)',
+        size: '8.6 MB',
+        version: 'v2.3',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: '',
+        published: true,
+        featured: false,
+        downloads: 208,
+        updatedAt: '2026-10-12',
+        maintainer: '林晓',
+        theme: 'emerald',
+        tags: ['图标文件夹', 'SVG图标', '双色图标', '2px线性', 'PPT插图'],
+        desc: '按通用办公、AI 智能协同、数据安全、行业方案分拆为 4 个子文件包，可一键下载全部 360+ 枚图标，也可打开文件夹按主题单独下载。',
+        folderFiles: [
+          { id: 'sub_ico_1', name: '01_通用办公与飞书协同基础图标集(100枚).svg', format: 'SVG', spec: '24×24px 标准网格', size: '2.1 MB', downloads: 134 },
+          { id: 'sub_ico_2', name: '02_AI大模型与智能体业务双色渐变图标集(80枚).svg', format: 'SVG', spec: '48×48px 双色弥散', size: '2.4 MB', downloads: 118 },
+          { id: 'sub_ico_3', name: '03_企业安全合规与云原生架构图标集(90枚).svg', format: 'SVG', spec: '24×24px 线性', size: '1.9 MB', downloads: 76 },
+          { id: 'sub_ico_4', name: '04_前端开发WebFont字体包(woff2+symbol.js).zip', format: 'ZIP', spec: 'IconFont 全集', size: '2.2 MB', downloads: 91 }
+        ]
+      },
+      {
+        id: 'ast_brand_film',
+        title: '2026 年度品牌宣传片《连接无限可能》成片 (单文件直下)',
+        category: '视频',
+        format: 'MP4 (4K H.264 60fps)',
+        size: '540.0 MB',
+        version: 'v1.2',
+        deliveryType: 'download',
+        isFolder: false,
+        externalUrl: '',
+        published: true,
+        featured: false,
+        downloads: 112,
+        updatedAt: '2026-10-10',
+        maintainer: '林晓',
+        theme: 'rose',
+        tags: ['品牌宣传片', 'TVC成片', '展厅视频', '单文件'],
+        desc: '90 秒年度品牌宣传片中英双语字幕标准成片，可供展会大屏轮播、客户路演暖场直接下载使用。',
+        folderFiles: []
+      },
+      {
+        id: 'ast_cobrand_guide',
+        title: '品牌联合联名 (Co-Branding) 与外部生态合作视觉指南',
+        category: '规范',
+        format: '飞书云文档外链 / PDF',
+        size: '15.8 MB',
+        version: 'v1.4',
+        deliveryType: 'link',
+        isFolder: false,
+        externalUrl: 'https://open.feishu.cn/document/co-branding-guideline',
+        published: true,
+        featured: false,
+        downloads: 95,
+        updatedAt: '2026-10-08',
+        maintainer: '林晓',
+        theme: 'cyan',
+        tags: ['联名规范', '生态合作', '双Logo比例', '赞助商背板'],
+        desc: '规范本品牌与外部合作伙伴联合宣发时的标志排列顺序、中间分隔线粗细比例、视觉主次关系及飞书品牌审批流说明。',
+        folderFiles: []
+      },
+      {
+        id: 'ast_pattern_badges',
+        title: '品牌辅助几何图形、底纹肌理与周年庆典徽章文件夹',
+        category: '图形',
+        format: '文件夹 (AI / SVG / PNG)',
+        size: '22.1 MB',
+        version: 'v1.1',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: '',
+        published: true,
+        featured: false,
+        downloads: 87,
+        updatedAt: '2026-10-05',
+        maintainer: '陈默',
+        theme: 'emerald',
+        tags: ['辅助图形文件夹', '品牌底纹', '周边礼盒', '工牌延展'],
+        desc: '内含无缝拼接科技底纹、飞书个人资料背景图、文化衫印花及工牌挂绳延展矢量文件，支持打开文件夹挑选单个纹样下载。',
+        folderFiles: [
+          { id: 'sub_pat_1', name: '01_品牌几何网格无缝拼接底纹_深浅双色.svg', format: 'SVG', spec: '矢量无缝平铺', size: '3.8 MB', downloads: 56 },
+          { id: 'sub_pat_2', name: '02_飞书个人名片与群聊官方品牌背景图合集(5张).png', format: 'PNG', spec: '2560×1440 px', size: '7.4 MB', downloads: 79 },
+          { id: 'sub_pat_3', name: '03_企业文化衫与帆布袋周边印花矢量源文件.ai', format: 'AI', spec: 'CMYK 专色印刷', size: '10.9 MB', downloads: 42 }
+        ]
+      },
+      {
+        id: 'ast_autumn_kv_draft',
+        title: '2026 秋季全球伙伴大会主视觉 KV 与会务物料文件夹 (后台预审待上架)',
+        category: '设计素材',
+        format: '文件夹 (PSD / PNG / AI)',
+        size: '94.0 MB',
+        version: 'v0.9-rc',
+        deliveryType: 'folder',
+        isFolder: true,
+        externalUrl: '',
+        published: false,
+        featured: false,
+        downloads: 19,
+        updatedAt: '2026-10-20',
+        maintainer: '陈默',
+        theme: 'amber',
+        tags: ['伙伴大会', '秋季战役', '会务物料', '待上架预审'],
+        desc: '当前处于「已下架/预审」状态，仅在后台管理中心可见。管理员或内容维护员点击「上架」后即可立即向全员前台开放。',
+        folderFiles: [
+          { id: 'sub_aut_1', name: '01_秋季伙伴大会主视觉KV_终审稿.png', format: 'PNG', spec: '3840×2160 px', size: '24.0 MB', downloads: 12 },
+          { id: 'sub_aut_2', name: '02_大会嘉宾胸牌与签到处背板延展.ai', format: 'AI', spec: '印刷级源文件', size: '70.0 MB', downloads: 7 }
+        ]
+      }
+    ];
+
+    // 初始下载行为日志记录
+    const INITIAL_LOGS = [
+      { id: 'log_101', timestamp: '2026-10-21 09:42:18', userId: 'u_marketing', userName: '王梓轩', openId: 'ou_7c35b2d4e6f10293', department: '市场营销部', assetId: 'ast_ppt_master', assetTitle: '2026 飞书演示文稿 & 对外商业路演 Keynote/PPT 官方母版', category: '模板', actionType: '文件下载', device: '飞书桌面端 Windows' },
+      { id: 'log_102', timestamp: '2026-10-21 09:35:04', userId: 'u_growth', userName: '赵敏', openId: 'ou_1a68f4c9d2b30918', department: '增长运营部', assetId: 'ast_social_posters', assetTitle: '新媒体全渠道宣发海报模板集 (公众号首图/小红书/活动长图)', category: '模板', actionType: '文件下载', device: '飞书移动端 iOS' },
+      { id: 'log_103', timestamp: '2026-10-21 09:18:51', userId: 'u_maintainer', userName: '陈默', openId: 'ou_4d21e8f9a1c08812', department: '视觉传达组', assetId: 'ast_ui_figma', assetTitle: '企业级产品 UI 视觉组件库与飞书消息卡片设计套件', category: '设计素材', actionType: '访问外链', device: '飞书桌面端 macOS' },
+      { id: 'log_104', timestamp: '2026-10-20 18:22:10', userId: 'u_marketing', userName: '王梓轩', openId: 'ou_7c35b2d4e6f10293', department: '市场营销部', assetId: 'ast_logo_pack', assetTitle: '品牌核心 Logo 全格式标准资产包 (横版/竖版/反白/纯图形)', category: '图形', actionType: '文件下载', device: '飞书桌面端 Windows' },
+      { id: 'log_105', timestamp: '2026-10-20 16:49:33', userId: 'u_admin', userName: '林晓', openId: 'ou_8f92a1c0b3e7109d', department: '品牌与创意部', assetId: 'ast_vi_2026', assetTitle: '2026 品牌视觉识别系统 (VI) 核心规范手册 v3.2', category: '规范', actionType: '文件下载', device: '飞书桌面端 macOS' },
+      { id: 'log_106', timestamp: '2026-10-20 15:12:40', userId: 'u_growth', userName: '赵敏', openId: 'ou_1a68f4c9d2b30918', department: '增长运营部', assetId: 'ast_video_bumper', assetTitle: '品牌动态 Logo 演绎片头 & 视频转场包装合集 (4K 60fps)', category: '视频', actionType: '文件下载', device: '飞书桌面端 macOS' },
+      { id: 'log_107', timestamp: '2026-10-20 14:05:19', userId: 'u_other_1', userName: '周航', openId: 'ou_9e81c4a2b7f0192a', department: '产品研发部', assetId: 'ast_icon_library', assetTitle: '品牌定制线性与双色弥散图标库 (360+ 矢量 Icons)', category: '图形', actionType: '文件下载', device: '飞书桌面端 macOS' },
+      { id: 'log_108', timestamp: '2026-10-20 11:30:02', userId: 'u_other_2', userName: '沈佳宜', openId: 'ou_3b77d9e1a4c8201f', department: '销售与客户成功部', assetId: 'ast_ppt_master', assetTitle: '2026 飞书演示文稿 & 对外商业路演 Keynote/PPT 官方母版', category: '模板', actionType: '文件下载', device: '飞书桌面端 Windows' },
+      { id: 'log_109', timestamp: '2026-10-19 17:44:27', userId: 'u_other_3', userName: '吴昊', openId: 'ou_6c12a8f3d9e0411b', department: '市场营销部', assetId: 'ast_kv_aether', assetTitle: 'Aether 3D 流体玻璃态品牌主视觉 KV 渲染素材包', category: '设计素材', actionType: '文件下载', device: '飞书桌面端 macOS' },
+      { id: 'log_110', timestamp: '2026-10-19 15:08:11', userId: 'u_other_4', userName: '郑语桐', openId: 'ou_2f90e1c7b8a3120c', department: '人力资源与行政部', assetId: 'ast_pattern_badges', assetTitle: '品牌辅助几何图形、底纹肌理与周年庆典徽章矢量包', category: '图形', actionType: '文件下载', device: '飞书桌面端 Windows' }
+    ];
+
+    // ==================== 2. 全局响应式状态管理 ====================
+    let state = {
+      portalMode: 'frontend', // 'frontend' (飞书前台员工端) | 'backend' (管理后台: 数据看板+素材库管理)
+      currentView: 'home',
+      currentUserKey: 'u_admin',
+      homeFeedMode: 'featured', // featured | latest | popular
+      libCategory: 'all',
+      libLayout: 'grid', // grid | list
+      analyticsRange: '30d', // 7d | 30d | all
+      adminStatusFilter: 'all', // all | published | unpublished
+      adminSelectedIds: {},
+      cartIds: {},
+      formDeliveryMode: 'folder',
+      draftFolderFiles: [],
+      activeFolderId: null,
+      selectedSubFileIds: {},
+      assets: [],
+      logs: [],
+      deptBaseCounts: {
+        '市场营销部': 428,
+        '增长运营部': 312,
+        '品牌与创意部': 265,
+        '销售与客户成功部': 218,
+        '产品研发部': 146,
+        '人力资源与行政部': 89
+      }
+    };
+
+    // 图表实例引用
+    let trendChartInstance = null;
+    let categoryChartInstance = null;
+    let deptChartInstance = null;
+
+    // 读取与持久化本地状态（带 try/catch 保护）
+    function loadState() {
+      try {
+        const savedAssets = localStorage.getItem('feishu_brandhub_assets_v2');
+        const savedLogs = localStorage.getItem('feishu_brandhub_logs_v2');
+        state.assets = savedAssets ? JSON.parse(savedAssets) : JSON.parse(JSON.stringify(INITIAL_ASSETS));
+        state.logs = savedLogs ? JSON.parse(savedLogs) : JSON.parse(JSON.stringify(INITIAL_LOGS));
+      } catch (err) {
+        state.assets = JSON.parse(JSON.stringify(INITIAL_ASSETS));
+        state.logs = JSON.parse(JSON.stringify(INITIAL_LOGS));
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('feishu_brandhub_assets_v2', JSON.stringify(state.assets));
+        localStorage.setItem('feishu_brandhub_logs_v2', JSON.stringify(state.logs));
+      } catch (err) {
+        // Ignore sandbox storage restrictions
+      }
+    }
+
+    // ==================== 3. 为每个素材生成高精细度矢量缩略图 SVG ====================
+    function getAssetArtworkSVG(asset, isLarge = false) {
+      const cat = asset.category;
+      const hClass = isLarge ? 'h-56 sm:h-64' : 'h-40';
+
+      if (cat === '规范') {
+        return `
+          <div class="w-full ${hClass} bg-gradient-to-br from-slate-900 via-cyan-950 to-feishu-900 relative overflow-hidden flex items-center justify-center p-4">
+            <svg class="w-full h-full max-w-[240px]" viewBox="0 0 240 140" fill="none">
+              <rect x="20" y="14" width="130" height="112" rx="10" fill="#0F172A" stroke="#38BDF8" stroke-width="1.8"/>
+              <rect x="34" y="28" width="46" height="10" rx="3" fill="#38BDF8"/>
+              <rect x="34" y="46" width="90" height="6" rx="3" fill="#475569"/>
+              <rect x="34" y="58" width="74" height="6" rx="3" fill="#475569"/>
+              <circle cx="52" cy="92" r="14" fill="#3370FF"/>
+              <circle cx="88" cy="92" r="14" fill="#06B6D4"/>
+              <circle cx="124" cy="92" r="14" fill="#6366F1"/>
+              <rect x="138" y="26" width="82" height="96" rx="8" fill="#1E293B" stroke="#94A3B8" stroke-width="1.2"/>
+              <text x="152" y="58" fill="#F8FAFC" font-size="22" font-weight="700" font-family="Inter, sans-serif">Aa</text>
+              <path d="M152 76H204M152 88H192M152 100H180" stroke="#38BDF8" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>`;
+      }
+      if (cat === '模板') {
+        return `
+          <div class="w-full ${hClass} bg-gradient-to-br from-indigo-900 via-feishu-700 to-purple-900 relative overflow-hidden flex items-center justify-center p-4">
+            <svg class="w-full h-full max-w-[240px]" viewBox="0 0 240 140" fill="none">
+              <rect x="18" y="16" width="164" height="104" rx="10" fill="#1E1B4B" stroke="#818CF8" stroke-width="1.8"/>
+              <rect x="30" y="28" width="65" height="80" rx="6" fill="#312E81"/>
+              <rect x="38" y="38" width="40" height="8" rx="2" fill="#A5B4FC"/>
+              <rect x="38" y="52" width="48" height="5" rx="2" fill="#6366F1"/>
+              <rect x="105" y="28" width="65" height="36" rx="6" fill="#3730A3"/>
+              <path d="M115 54L128 42L140 49L158 34" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="105" y="72" width="65" height="36" rx="6" fill="#312E81"/>
+              <rect x="158" y="32" width="64" height="90" rx="8" fill="#3370FF" stroke="#E0E7FF" stroke-width="1.5"/>
+              <rect x="168" y="46" width="44" height="6" rx="3" fill="white"/>
+              <rect x="168" y="58" width="32" height="5" rx="2.5" fill="#BFDBFE"/>
+              <circle cx="190" cy="92" r="14" fill="#60A5FA" fill-opacity="0.4" stroke="white" stroke-width="1.5"/>
+            </svg>
+          </div>`;
+      }
+      if (cat === '视频') {
+        return `
+          <div class="w-full ${hClass} bg-gradient-to-br from-slate-900 via-rose-950 to-indigo-950 relative overflow-hidden flex items-center justify-center p-4">
+            <svg class="w-full h-full max-w-[240px]" viewBox="0 0 240 140" fill="none">
+              <rect x="20" y="14" width="200" height="112" rx="12" fill="#0F172A" stroke="#FB7185" stroke-width="1.6"/>
+              <circle cx="120" cy="64" r="24" fill="#F43F5E" fill-opacity="0.9"/>
+              <polygon points="114,53 114,75 133,64" fill="white"/>
+              <rect x="34" y="102" width="172" height="6" rx="3" fill="#334155"/>
+              <rect x="34" y="102" width="98" height="6" rx="3" fill="#FB7185"/>
+              <circle cx="132" cy="105" r="5" fill="white"/>
+              <text x="36" y="34" fill="#FDA4AF" font-size="10" font-family="monospace">4K 60FPS · PRORES</text>
+            </svg>
+          </div>`;
+      }
+      if (cat === '图形') {
+        return `
+          <div class="w-full ${hClass} bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-900 relative overflow-hidden flex items-center justify-center p-4">
+            <svg class="w-full h-full max-w-[240px]" viewBox="0 0 240 140" fill="none">
+              <path d="M40 20H200M40 70H200M40 120H200M70 10V130M120 10V130M170 10V130" stroke="rgba(52,211,153,0.18)" stroke-width="1"/>
+              <rect x="62" y="32" width="56" height="56" rx="14" fill="#10B981" fill-opacity="0.85" stroke="#A7F3D0" stroke-width="2"/>
+              <circle cx="148" cy="76" r="32" fill="#06B6D4" fill-opacity="0.8" stroke="#CFFAFE" stroke-width="2"/>
+              <path d="M72 96C95 45 145 45 168 96" stroke="#FCD34D" stroke-width="2.2" stroke-dasharray="4 4"/>
+              <rect x="68" y="92" width="6" height="6" fill="white" stroke="#10B981"/>
+              <rect x="164" y="92" width="6" height="6" fill="white" stroke="#10B981"/>
+            </svg>
+          </div>`;
+      }
+      // 默认：设计素材 (3D KV / UI)
+      return `
+        <div class="w-full ${hClass} bg-gradient-to-br from-feishu-900 via-blue-800 to-cyan-700 relative overflow-hidden flex items-center justify-center p-4">
+          <svg class="w-full h-full max-w-[240px] animate-glow" viewBox="0 0 240 140" fill="none">
+            <defs>
+              <linearGradient id="kvSphere" x1="40" y1="20" x2="190" y2="120" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#38BDF8"/>
+                <stop offset="0.5" stop-color="#3370FF"/>
+                <stop offset="1" stop-color="#A855F7"/>
+              </linearGradient>
+            </defs>
+            <circle cx="105" cy="70" r="44" fill="url(#kvSphere)"/>
+            <rect x="100" y="30" width="90" height="76" rx="16" fill="rgba(255,255,255,0.16)" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+            <circle cx="152" cy="62" r="18" fill="#22D3EE" fill-opacity="0.7"/>
+            <path d="M116 86H172" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>`;
+    }
+
+    // ==================== 4. 前后台严格隔离与飞书身份同步 ====================
+    function enterFrontendPortal() {
+      state.portalMode = 'frontend';
+      switchView('home');
+    }
+
+    function togglePortalMode() {
+      if (!canManageAssets()) {
+        showToast('普通员工账号仅可访问飞书前台，无法进入后台', 'warn');
+        state.portalMode = 'frontend';
+        switchView('home');
+        return;
+      }
+      if (state.portalMode === 'frontend') {
+        state.portalMode = 'backend';
+        switchView('admin');
+        showToast('已进入「管理后台」：可管理素材文件夹与查看下载分析看板（前台员工不可见）', 'info');
+      } else {
+        state.portalMode = 'frontend';
+        switchView('home');
+        showToast('已返回「飞书前台员工端」视图', 'info');
+      }
+    }
+
+    function syncPortalNavigationUI() {
+      const isBackend = state.portalMode === 'backend' && canManageAssets();
+      const feNav = document.getElementById('frontend-nav');
+      const beNav = document.getElementById('backend-nav');
+      const mFeNav = document.getElementById('mobile-frontend-nav');
+      const mBeNav = document.getElementById('mobile-backend-nav');
+      const portalBadge = document.getElementById('header-portal-badge');
+      const portalIndicator = document.getElementById('portal-mode-indicator');
+      const switchBtn = document.getElementById('btn-portal-switch');
+      const switchLabel = document.getElementById('btn-portal-switch-label');
+      const uploadBtn = document.getElementById('header-upload-btn');
+      const cartBtn = document.getElementById('header-cart-btn');
+
+      if (feNav) {
+        feNav.classList.toggle('hidden', isBackend);
+        feNav.classList.toggle('md:flex', !isBackend);
+      }
+      if (beNav) {
+        beNav.classList.toggle('hidden', !isBackend);
+        beNav.classList.toggle('md:flex', isBackend);
+      }
+      if (mFeNav) {
+        mFeNav.classList.toggle('hidden', isBackend);
+        mFeNav.classList.toggle('flex', !isBackend);
+      }
+      if (mBeNav) {
+        mBeNav.classList.toggle('hidden', !isBackend);
+        mBeNav.classList.toggle('flex', isBackend);
+      }
+      if (portalBadge) {
+        if (isBackend) {
+          portalBadge.textContent = '管理后台 · 仅管理员/维护员可见';
+          portalBadge.className = 'hidden sm:inline-flex items-center px-2 py-0.5 text-[11px] font-semibold bg-indigo-950 text-cyan-300 rounded border border-indigo-700';
+        } else {
+          portalBadge.textContent = '飞书前台 · 员工端';
+          portalBadge.className = 'hidden sm:inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium bg-feishu-50 text-feishu-600 rounded border border-feishu-200';
+        }
+      }
+      if (portalIndicator) {
+        if (isBackend) {
+          portalIndicator.textContent = '当前端：管理后台（包含下载看板与素材库管理，前台不可见）';
+          portalIndicator.className = 'px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 font-semibold';
+        } else {
+          portalIndicator.textContent = '当前端：飞书前台员工端（隐藏后台看板与管理中心）';
+          portalIndicator.className = 'px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-medium';
+        }
+      }
+      if (switchBtn) {
+        // 普通员工完全看不到进入管理后台的按钮
+        switchBtn.classList.toggle('hidden', !canManageAssets());
+        switchBtn.classList.toggle('inline-flex', canManageAssets());
+        if (isBackend) {
+          switchBtn.className = canManageAssets()
+            ? 'inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold shadow-sm transition'
+            : 'hidden';
+          if (switchLabel) switchLabel.textContent = '← 返回飞书前台';
+        } else {
+          switchBtn.className = canManageAssets()
+            ? 'inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-sm transition'
+            : 'hidden';
+          if (switchLabel) switchLabel.textContent = '进入管理后台';
+        }
+      }
+      if (uploadBtn) {
+        const showUpload = isBackend && canManageAssets();
+        uploadBtn.classList.toggle('hidden', !showUpload);
+        uploadBtn.classList.toggle('sm:inline-flex', showUpload);
+      }
+      if (cartBtn) {
+        cartBtn.classList.toggle('hidden', isBackend);
+      }
+    }
+
+    function switchView(viewName) {
+      // 如果普通员工试图访问后台视图，强制拦截回前台首页
+      if ((viewName === 'analytics' || viewName === 'admin') && !canManageAssets()) {
+        state.portalMode = 'frontend';
+        viewName = 'home';
+      }
+      if (viewName === 'analytics' || viewName === 'admin') {
+        state.portalMode = 'backend';
+      } else {
+        state.portalMode = 'frontend';
+      }
+
+      state.currentView = viewName;
+      syncPortalNavigationUI();
+
+      const views = ['home', 'library', 'analytics', 'admin'];
+      views.forEach(v => {
+        const sec = document.getElementById('view-' + v);
+        if (sec) sec.classList.toggle('hidden', v !== viewName);
+
+        const navBtn = document.getElementById('nav-' + v);
+        if (navBtn) {
+          if (v === 'admin' || v === 'analytics') {
+            navBtn.className = v === viewName
+              ? 'px-3.5 py-1.5 rounded-lg text-sm font-semibold transition flex items-center gap-1.5 bg-indigo-600 text-white shadow-sm'
+              : 'px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-indigo-200 hover:text-white';
+          } else {
+            navBtn.className = v === viewName
+              ? 'px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 bg-white text-feishu-600 shadow-sm'
+              : 'px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900';
+          }
+        }
+
+        const mNavBtn = document.getElementById('m-nav-' + v);
+        if (mNavBtn) {
+          if (v === viewName) {
+            mNavBtn.className = 'flex-1 py-1.5 px-2 rounded-lg text-xs font-semibold text-center bg-feishu-50 text-feishu-600';
+          } else {
+            mNavBtn.className = 'flex-1 py-1.5 px-2 rounded-lg text-xs font-medium text-center text-slate-600';
+          }
+        }
+      });
+
+      if (viewName === 'home') renderHomeView();
+      if (viewName === 'library') renderLibraryView();
+      if (viewName === 'analytics') renderAnalyticsView();
+      if (viewName === 'admin') renderAdminTable();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function getCurrentUser() {
+      return FEISHU_USERS[state.currentUserKey] || FEISHU_USERS.u_admin;
+    }
+
+    function canManageAssets() {
+      const u = getCurrentUser();
+      return u.role === 'admin' || u.role === 'maintainer';
+    }
+
+    function handleUserSwitch(userKey) {
+      if (!FEISHU_USERS[userKey]) return;
+      state.currentUserKey = userKey;
+      const switcher = document.getElementById('user-switcher');
+      if (switcher && switcher.value !== userKey) {
+        switcher.value = userKey;
+      }
+      // 若切换为普通员工且当前处于后台，立即退回飞书前台并隐藏后台入口
+      if (!canManageAssets() && state.portalMode === 'backend') {
+        state.portalMode = 'frontend';
+        state.currentView = 'home';
+      }
+      updateUserHeaderUI();
+      switchView(state.currentView);
+      const user = getCurrentUser();
+      showToast(
+        canManageAssets()
+          ? `已切换飞书账号：${user.name}（${user.roleLabel}），右上角可点击「进入管理后台」`
+          : `已切换飞书账号：${user.name}（普通员工），仅展示飞书前台，后台已完全隐藏`,
+        'info'
+      );
+    }
+
+    function updateUserHeaderUI() {
+      const u = getCurrentUser();
+      const avatarEl = document.getElementById('current-user-avatar');
+      const nameEl = document.getElementById('current-user-name');
+      const roleEl = document.getElementById('current-user-role-badge');
+      const deptEl = document.getElementById('current-user-dept');
+      const greetingEl = document.getElementById('hero-greeting');
+
+      if (avatarEl) {
+        avatarEl.textContent = u.avatarText;
+        avatarEl.className = `w-7 h-7 rounded-full ${u.avatarBg} text-white text-xs font-bold flex items-center justify-center shrink-0`;
+      }
+      if (nameEl) nameEl.textContent = u.name;
+      if (roleEl) {
+        roleEl.textContent = u.roleLabel;
+        roleEl.className = `text-[10px] px-1.5 py-0.2 rounded font-medium ${u.roleBadgeClass}`;
+      }
+      if (deptEl) deptEl.textContent = `${u.department} · 飞书免登`;
+      if (greetingEl) {
+        greetingEl.textContent = `飞书免登已连接 (${u.open_id.slice(0, 10)}...) · 欢迎你，${u.name}（${u.department} · ${u.jobTitle}）`;
+      }
+
+      // 更新导航栏在架素材数量徽标
+      const pubCount = state.assets.filter(a => a.published).length;
+      const navCount = document.getElementById('nav-library-count');
+      if (navCount) navCount.textContent = String(pubCount);
+      syncPortalNavigationUI();
+    }
+
+    // ==================== 5. 渲染首页推荐 (HOME VIEW) ====================
+    function setHomeFeedMode(mode) {
+      state.homeFeedMode = mode;
+      ['featured', 'latest', 'popular'].forEach(m => {
+        const btn = document.getElementById('home-tab-' + m);
+        if (btn) {
+          btn.className = m === mode
+            ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-feishu-50 text-feishu-600 transition'
+            : 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 transition';
+        }
+      });
+      renderHomeView();
+    }
+
+    function renderHomeView() {
+      const publishedAssets = state.assets.filter(a => a.published);
+      const totalDownloads = state.assets.reduce((acc, a) => acc + (a.downloads || 0), 0);
+
+      const statAssets = document.getElementById('hero-stat-assets');
+      const statDl = document.getElementById('hero-stat-downloads');
+      const badgeDl = document.getElementById('hero-total-downloads-badge');
+      if (statAssets) statAssets.textContent = String(publishedAssets.length);
+      if (statDl) statDl.textContent = totalDownloads.toLocaleString();
+      if (badgeDl) badgeDl.textContent = `已累计调用 ${totalDownloads.toLocaleString()} 次`;
+
+      // 渲染五大分类卡片
+      const catGrid = document.getElementById('home-category-grid');
+      if (catGrid) {
+        catGrid.innerHTML = CATEGORIES.map(c => {
+          const count = publishedAssets.filter(a => a.category === c.key).length;
+          return `
+            <button type="button" onclick="jumpToCategory('${c.key}')" class="group text-left bg-white hover:bg-feishu-50/40 rounded-2xl p-4 border border-slate-200/90 hover:border-feishu-400 feishu-shadow feishu-card-hover transition flex flex-col justify-between">
+              <div class="flex items-center justify-between w-full mb-3">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${c.badge}">${c.key}</span>
+                <span class="text-xs font-bold text-slate-400 group-hover:text-feishu-600 transition">${count} 项 →</span>
+              </div>
+              <div>
+                <div class="font-bold text-slate-900 text-sm group-hover:text-feishu-600 transition">${c.name}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">${c.sub}</div>
+              </div>
+            </button>
+          `;
+        }).join('');
+      }
+
+      // 渲染首页精选/最新/热门卡片
+      let feedList = [...publishedAssets];
+      if (state.homeFeedMode === 'featured') {
+        feedList = feedList.filter(a => a.featured);
+        if (feedList.length === 0) feedList = [...publishedAssets].slice(0, 6);
+      } else if (state.homeFeedMode === 'latest') {
+        feedList.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+      } else if (state.homeFeedMode === 'popular') {
+        feedList.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      }
+
+      const featuredGrid = document.getElementById('home-featured-grid');
+      if (featuredGrid) {
+        featuredGrid.innerHTML = feedList.slice(0, 6).map(asset => renderAssetCardHTML(asset)).join('');
+      }
+    }
+
+    function jumpToCategory(categoryKey) {
+      state.libCategory = categoryKey;
+      const searchInput = document.getElementById('lib-search-input');
+      if (searchInput) searchInput.value = '';
+      switchView('library');
+    }
+
+    function jumpToLibraryWithSearch(keyword) {
+      state.libCategory = 'all';
+      switchView('library');
+      const searchInput = document.getElementById('lib-search-input');
+      if (searchInput) {
+        searchInput.value = keyword || '';
+        renderLibraryView();
+      }
+    }
+
+    // ==================== 6. 渲染素材卡与素材中心 (LIBRARY VIEW) ====================
+    function getCategoryBadgeClass(catKey) {
+      const found = CATEGORIES.find(c => c.key === catKey);
+      return found ? found.badge : 'bg-slate-100 text-slate-700 border-slate-200';
+    }
+
+    function isAssetFolder(asset) {
+      return asset.deliveryType === 'folder' || Boolean(asset.isFolder) || (Array.isArray(asset.folderFiles) && asset.folderFiles.length > 0);
+    }
+
+    function renderAssetCardHTML(asset) {
+      const inCart = Boolean(state.cartIds[asset.id]);
+      const isFolder = isAssetFolder(asset);
+      const isLink = asset.deliveryType === 'link';
+      const subCount = Array.isArray(asset.folderFiles) ? asset.folderFiles.length : 0;
+
+      // 文件夹内部子文件预览摘要条
+      const folderPreviewStrip = isFolder && subCount > 0 ? `
+        <div onclick="openFolderModal('${asset.id}')" class="mt-2 p-2.5 rounded-xl bg-feishu-50/60 border border-feishu-100 hover:border-feishu-300 cursor-pointer transition space-y-1">
+          <div class="flex items-center justify-between text-[11px] font-semibold text-feishu-700">
+            <span class="flex items-center gap-1">
+              <svg class="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+              <span>同类素材文件夹 · 内含 ${subCount} 个子文件</span>
+            </span>
+            <span class="text-feishu-600 hover:underline">展开挑选 →</span>
+          </div>
+          <div class="text-[11px] text-slate-500 truncate">
+            ${asset.folderFiles.slice(0, 2).map(f => escapeHTML(f.name)).join(' 、 ')}${subCount > 2 ? ` 等 ${subCount} 项` : ''}
+          </div>
+        </div>
+      ` : '';
+
+      // 底部按钮区：区分「素材文件夹（打开文件夹 + 下载全部）」与「单文件（立即下载/打开外链）」
+      let actionButtonsHTML = '';
+      if (isFolder) {
+        actionButtonsHTML = `
+          <div class="flex items-center gap-1.5 w-full sm:w-auto justify-end">
+            <button type="button" onclick="openFolderModal('${asset.id}')" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl border border-feishu-300 bg-white hover:bg-feishu-50 text-feishu-700 text-xs font-semibold transition flex items-center justify-center gap-1" title="打开文件夹查看所有子素材并按需单独下载">
+              <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg>
+              <span>打开文件夹</span>
+            </button>
+            <button type="button" onclick="triggerFolderDownloadAll('${asset.id}')" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl bg-feishu-500 hover:bg-feishu-600 text-white text-xs font-semibold shadow-sm transition flex items-center justify-center gap-1" title="将文件夹内所有素材一键全部打包下载">
+              <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>下载全部</span>
+            </button>
+          </div>
+        `;
+      } else {
+        actionButtonsHTML = `
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="toggleCartItem('${asset.id}')" class="p-2 rounded-xl border ${inCart ? 'border-feishu-500 bg-feishu-50 text-feishu-600' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-100'} text-xs transition" title="${inCart ? '移出批量下载篮' : '加入批量下载篮'}">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                ${inCart
+                  ? '<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>'
+                  : '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>'}
+              </svg>
+            </button>
+            <button type="button" onclick="triggerAssetDownload('${asset.id}')" class="px-3.5 py-2 rounded-xl ${isLink ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-feishu-500 hover:bg-feishu-600'} text-white text-xs font-semibold shadow-sm transition flex items-center gap-1">
+              ${isLink
+                ? '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg><span>打开外链</span>'
+                : '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg><span>立即下载</span>'}
+            </button>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden feishu-shadow feishu-card-hover flex flex-col justify-between">
+          <div>
+            <!-- 缩略图区域 -->
+            <div class="relative cursor-pointer group" onclick="${isFolder ? `openFolderModal('${asset.id}')` : `openAssetDetail('${asset.id}')`}">
+              ${getAssetArtworkSVG(asset, false)}
+              <div class="absolute top-3 left-3 flex flex-wrap items-center gap-1.5">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border backdrop-blur-md bg-white/90 text-slate-800">${asset.category}</span>
+                ${isFolder
+                  ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400 text-slate-950 flex items-center gap-1">📁 文件夹 (${subCount})</span>`
+                  : `<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-900/75 text-white">${isLink ? '🔗 外链' : '📄 单文件'}</span>`}
+                ${asset.featured ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-feishu-500 text-white">推荐</span>' : ''}
+              </div>
+              <div class="absolute top-3 right-3">
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold bg-slate-900/80 text-white backdrop-blur">${asset.version}</span>
+              </div>
+              <div class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                <span class="px-3.5 py-1.5 rounded-xl bg-white text-slate-900 text-xs font-semibold shadow">
+                  ${isFolder ? `打开文件夹查看 ${subCount} 个子素材` : '点击查看详情与预览'}
+                </span>
+              </div>
+            </div>
+
+            <!-- 文本信息 -->
+            <div class="p-4 space-y-2">
+              <div class="flex items-start justify-between gap-2">
+                <h3 onclick="${isFolder ? `openFolderModal('${asset.id}')` : `openAssetDetail('${asset.id}')`}" class="font-bold text-slate-900 text-sm leading-snug hover:text-feishu-600 cursor-pointer line-clamp-2">${escapeHTML(asset.title)}</h3>
+              </div>
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">${escapeHTML(asset.desc)}</p>
+
+              ${folderPreviewStrip}
+
+              <!-- 标签 -->
+              <div class="flex flex-wrap gap-1 pt-1">
+                ${(asset.tags || []).slice(0, 3).map(t => `<span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[11px]">#${escapeHTML(t)}</span>`).join('')}
+              </div>
+            </div>
+          </div>
+
+          <!-- 底部元数据与下载按钮（支持「打开文件夹+下载全部」或「立即下载」） -->
+          <div class="px-4 py-3 bg-slate-50/70 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+            <div class="text-[11px] text-slate-500 space-y-0.5">
+              <div class="font-medium text-slate-700">${escapeHTML(asset.format)} · ${escapeHTML(asset.size)}</div>
+              <div>已调用 <strong class="text-slate-800">${asset.downloads}</strong> 次</div>
+            </div>
+            ${actionButtonsHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    function setLibraryLayout(layout) {
+      state.libLayout = layout;
+      const gBtn = document.getElementById('lib-view-grid');
+      const lBtn = document.getElementById('lib-view-list');
+      if (gBtn && lBtn) {
+        gBtn.className = layout === 'grid' ? 'p-1.5 rounded-lg bg-white text-feishu-600 shadow-sm' : 'p-1.5 rounded-lg text-slate-500 hover:text-slate-800';
+        lBtn.className = layout === 'list' ? 'p-1.5 rounded-lg bg-white text-feishu-600 shadow-sm' : 'p-1.5 rounded-lg text-slate-500 hover:text-slate-800';
+      }
+      renderLibraryView();
+    }
+
+    function clearLibraryFilters() {
+      state.libCategory = 'all';
+      const sInput = document.getElementById('lib-search-input');
+      const dFilter = document.getElementById('lib-delivery-filter');
+      if (sInput) sInput.value = '';
+      if (dFilter) dFilter.value = 'all';
+      renderLibraryView();
+    }
+
+    function selectLibCategory(catKey) {
+      state.libCategory = catKey;
+      renderLibraryView();
+    }
+
+    function renderLibraryView() {
+      const published = state.assets.filter(a => a.published);
+
+      // 渲染分类胶囊
+      const pillsEl = document.getElementById('lib-category-pills');
+      if (pillsEl) {
+        const allItems = [{ key: 'all', label: `全部素材 (${published.length})` }].concat(
+          CATEGORIES.map(c => ({
+            key: c.key,
+            label: `${c.key} (${published.filter(a => a.category === c.key).length})`
+          }))
+        );
+        pillsEl.innerHTML = allItems.map(item => {
+          const active = state.libCategory === item.key;
+          return `<button type="button" onclick="selectLibCategory('${item.key}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold transition ${active ? 'bg-feishu-500 text-white shadow-sm' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}">${item.label}</button>`;
+        }).join('');
+      }
+
+      const keyword = (document.getElementById('lib-search-input')?.value || '').trim().toLowerCase();
+      const deliveryFilter = document.getElementById('lib-delivery-filter')?.value || 'all';
+      const sortMode = document.getElementById('lib-sort-select')?.value || 'newest';
+
+      let filtered = published.filter(a => {
+        if (state.libCategory !== 'all' && a.category !== state.libCategory) return false;
+        if (deliveryFilter === 'folder' && !isAssetFolder(a)) return false;
+        if (deliveryFilter === 'download' && (isAssetFolder(a) || a.deliveryType !== 'download')) return false;
+        if (deliveryFilter === 'link' && a.deliveryType !== 'link') return false;
+        if (keyword) {
+          const subNames = (a.folderFiles || []).map(f => f.name).join(' ');
+          const hay = `${a.title} ${a.category} ${a.format} ${a.desc} ${(a.tags || []).join(' ')} ${subNames}`.toLowerCase();
+          if (!hay.includes(keyword)) return false;
+        }
+        return true;
+      });
+
+      if (sortMode === 'newest') {
+        filtered.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+      } else if (sortMode === 'downloads') {
+        filtered.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+      } else if (sortMode === 'title') {
+        filtered.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+      }
+
+      const summaryEl = document.getElementById('lib-result-summary');
+      if (summaryEl) {
+        summaryEl.textContent = `共筛选出 ${filtered.length} 项在架素材（含文件夹与单文件）`;
+      }
+
+      const container = document.getElementById('library-assets-container');
+      if (!container) return;
+
+      if (filtered.length === 0) {
+        container.className = 'bg-white rounded-2xl border border-slate-200 p-12 text-center';
+        container.innerHTML = `
+          <div class="max-w-sm mx-auto space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <div class="text-sm font-bold text-slate-800">未找到匹配的已上架品牌素材</div>
+            <p class="text-xs text-slate-500">请尝试清空筛选条件</p>
+            <button type="button" onclick="clearLibraryFilters()" class="px-4 py-2 rounded-xl bg-feishu-500 text-white text-xs font-semibold">重置筛选条件</button>
+          </div>
+        `;
+        return;
+      }
+
+      if (state.libLayout === 'grid') {
+        container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5';
+        container.innerHTML = filtered.map(a => renderAssetCardHTML(a)).join('');
+      } else {
+        container.className = 'space-y-3';
+        container.innerHTML = filtered.map(a => {
+          const isFolder = isAssetFolder(a);
+          const isLink = a.deliveryType === 'link';
+          const subCount = (a.folderFiles || []).length;
+          return `
+            <div class="bg-white rounded-2xl border border-slate-200/90 p-4 feishu-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-feishu-400 transition">
+              <div class="flex items-start gap-3.5 min-w-0">
+                <div onclick="${isFolder ? `openFolderModal('${a.id}')` : `openAssetDetail('${a.id}')`}" class="w-24 h-16 rounded-xl overflow-hidden shrink-0 cursor-pointer">
+                  ${getAssetArtworkSVG(a, false).replace('h-40', 'h-16')}
+                </div>
+                <div class="min-w-0 space-y-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getCategoryBadgeClass(a.category)}">${a.category}</span>
+                    ${isFolder ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">📁 文件夹 (${subCount}个文件)</span>` : ''}
+                    <span class="text-[11px] font-mono text-slate-500">${a.version}</span>
+                    <span class="text-[11px] text-slate-400">· ${escapeHTML(a.format)} (${escapeHTML(a.size)})</span>
+                  </div>
+                  <h3 onclick="${isFolder ? `openFolderModal('${a.id}')` : `openAssetDetail('${a.id}')`}" class="text-sm font-bold text-slate-900 hover:text-feishu-600 cursor-pointer truncate">${escapeHTML(a.title)}</h3>
+                  <p class="text-xs text-slate-500 truncate">${escapeHTML(a.desc)}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+                <span class="text-xs text-slate-500 mr-2">已调用 <strong>${a.downloads}</strong> 次</span>
+                ${isFolder ? `
+                  <button type="button" onclick="openFolderModal('${a.id}')" class="px-3 py-1.5 rounded-xl border border-feishu-300 bg-white text-feishu-700 text-xs font-semibold hover:bg-feishu-50">打开文件夹</button>
+                  <button type="button" onclick="triggerFolderDownloadAll('${a.id}')" class="px-3.5 py-1.5 rounded-xl bg-feishu-500 hover:bg-feishu-600 text-white text-xs font-semibold">下载全部</button>
+                ` : `
+                  <button type="button" onclick="openAssetDetail('${a.id}')" class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-700 hover:bg-slate-50">预览</button>
+                  <button type="button" onclick="triggerAssetDownload('${a.id}')" class="px-3.5 py-1.5 rounded-xl ${isLink ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-feishu-500 hover:bg-feishu-600'} text-white text-xs font-semibold">
+                    ${isLink ? '打开外链' : '立即下载'}
+                  </button>
+                `}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // ==================== 6B. 素材文件夹内部浏览器 Modal 与单文件/整包下载逻辑 ====================
+    function openFolderModal(assetId) {
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+      if (!isAssetFolder(asset)) {
+        openAssetDetail(assetId);
+        return;
+      }
+      state.activeFolderId = assetId;
+      state.selectedSubFileIds = {};
+
+      const titleEl = document.getElementById('folder-modal-title');
+      const catEl = document.getElementById('folder-modal-cat');
+      const statsEl = document.getElementById('folder-modal-stats');
+      const searchInput = document.getElementById('folder-internal-search');
+      if (titleEl) titleEl.textContent = asset.title;
+      if (catEl) catEl.textContent = `${asset.category} · ${asset.version}`;
+      if (statsEl) statsEl.textContent = `共 ${(asset.folderFiles || []).length} 个子文件 · 总大小 ${asset.size}`;
+      if (searchInput) searchInput.value = '';
+
+      renderFolderModalFiles();
+      document.getElementById('modal-folder-explorer').classList.remove('hidden');
+    }
+
+    function closeFolderModal() {
+      const modal = document.getElementById('modal-folder-explorer');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function renderFolderModalFiles() {
+      const asset = state.assets.find(a => a.id === state.activeFolderId);
+      const container = document.getElementById('folder-modal-files-container');
+      if (!asset || !container) return;
+
+      const kw = (document.getElementById('folder-internal-search')?.value || '').trim().toLowerCase();
+      const subFiles = (asset.folderFiles || []).filter(f => {
+        if (!kw) return true;
+        return `${f.name} ${f.format} ${f.spec}`.toLowerCase().includes(kw);
+      });
+
+      if (subFiles.length === 0) {
+        container.innerHTML = `<div class="col-span-2 py-10 text-center text-xs text-slate-400">文件夹内没有匹配该关键词的子文件</div>`;
+        return;
+      }
+
+      container.innerHTML = subFiles.map((f, index) => {
+        const checked = Boolean(state.selectedSubFileIds[f.id]);
+        return `
+          <div class="bg-white rounded-xl border ${checked ? 'border-feishu-500 ring-1 ring-feishu-500/30' : 'border-slate-200'} p-3.5 flex items-center justify-between gap-3 hover:border-feishu-400 transition shadow-sm">
+            <div class="flex items-start gap-3 min-w-0">
+              <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleSubFileSelect('${f.id}', this.checked)" aria-label="勾选子文件" class="mt-1 rounded border-slate-300 text-feishu-600 focus:ring-feishu-500" />
+              <div class="w-10 h-10 rounded-xl bg-feishu-50 border border-feishu-100 text-feishu-600 font-mono text-[11px] font-bold flex items-center justify-center shrink-0">
+                ${escapeHTML(f.format || 'FILE')}
+              </div>
+              <div class="min-w-0">
+                <div class="text-xs font-bold text-slate-900 truncate" title="${escapeHTML(f.name)}">${escapeHTML(f.name)}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">${escapeHTML(f.spec || '标准规格')} · ${escapeHTML(f.size || '2.0 MB')}</div>
+                <div class="text-[10px] text-slate-400 mt-0.5">已被单独下载 <strong class="text-slate-700">${f.downloads || 0}</strong> 次</div>
+              </div>
+            </div>
+
+            <button type="button" onclick="triggerSubFileDownload('${asset.id}', '${f.id}')" class="px-3 py-1.5 rounded-xl bg-feishu-50 hover:bg-feishu-500 text-feishu-700 hover:text-white border border-feishu-200 text-xs font-semibold shrink-0 transition flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              <span>单独下载</span>
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleSubFileSelect(subFileId, checked) {
+      if (checked) {
+        state.selectedSubFileIds[subFileId] = true;
+      } else {
+        delete state.selectedSubFileIds[subFileId];
+      }
+      renderFolderModalFiles();
+    }
+
+    function downloadSelectedSubFiles() {
+      const asset = state.assets.find(a => a.id === state.activeFolderId);
+      if (!asset) return;
+      const ids = Object.keys(state.selectedSubFileIds);
+      if (ids.length === 0) {
+        showToast('请先在文件夹列表中勾选需要下载的子文件', 'warn');
+        return;
+      }
+      ids.forEach(subId => triggerSubFileDownload(asset.id, subId));
+      state.selectedSubFileIds = {};
+      renderFolderModalFiles();
+    }
+
+    function triggerCurrentFolderDownloadAll() {
+      if (!state.activeFolderId) return;
+      triggerFolderDownloadAll(state.activeFolderId);
+    }
+
+    // 打包下载整个文件夹（「下载全部」）
+    function triggerFolderDownloadAll(assetId) {
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+      const user = getCurrentUser();
+      const subFiles = asset.folderFiles || [];
+
+      asset.downloads = (asset.downloads || 0) + 1;
+      state.deptBaseCounts[user.department] = (state.deptBaseCounts[user.department] || 0) + 1;
+
+      const newLog = {
+        id: 'log_all_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        timestamp: formatNowTimestamp(),
+        userId: user.id,
+        userName: user.name,
+        openId: user.open_id,
+        department: user.department,
+        assetId: asset.id,
+        assetTitle: `${asset.title} [共 ${subFiles.length} 个文件整包]`,
+        category: asset.category,
+        actionType: '下载全部(整包)',
+        device: user.device
+      };
+      state.logs.unshift(newLog);
+      saveState();
+
+      const bundleContent = [
+        `===================================================================`,
+        `  BrandHub · 飞书品牌资产中心 【文件夹整包下载清单】`,
+        `===================================================================`,
+        `文件夹名称：${asset.title}`,
+        `所属分类：${asset.category} (${asset.version})`,
+        `包含子文件数量：${subFiles.length} 个`,
+        `总包体大小：${asset.size}`,
+        `-------------------------------------------------------------------`,
+        `【包含的子文件列表】：`,
+        ...subFiles.map((f, idx) => `  ${idx + 1}. ${f.name} (${f.format} | ${f.spec} | ${f.size})`),
+        `-------------------------------------------------------------------`,
+        `调用飞书员工：${user.name} (${user.department} · ${user.open_id})`,
+        `打包下载时间：${newLog.timestamp}`,
+        `===================================================================`
+      ].join('\n');
+
+      try {
+        const blob = new Blob([bundleContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safeName = asset.title.replace(/[^\w\u4e00-\u9fa5\-]/g, '_').slice(0, 28);
+        a.download = `${safeName}_全部素材整包_${asset.version}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (e) {}
+
+      renderHomeView();
+      renderLibraryView();
+      if (state.currentView === 'analytics') renderAnalyticsView();
+      if (state.currentView === 'admin') renderAdminTable();
+
+      showToast(
+        `已打包下载全部：「${asset.title.slice(0, 14)}...」（共 ${subFiles.length} 个子文件），后台已记录`,
+        'success'
+      );
+    }
+
+    // 文件夹内单个子文件「单独下载」
+    function triggerSubFileDownload(assetId, subFileId) {
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+      const subFile = (asset.folderFiles || []).find(f => f.id === subFileId);
+      if (!subFile) return;
+      const user = getCurrentUser();
+
+      subFile.downloads = (subFile.downloads || 0) + 1;
+      asset.downloads = (asset.downloads || 0) + 1;
+      state.deptBaseCounts[user.department] = (state.deptBaseCounts[user.department] || 0) + 1;
+
+      const newLog = {
+        id: 'log_sub_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        timestamp: formatNowTimestamp(),
+        userId: user.id,
+        userName: user.name,
+        openId: user.open_id,
+        department: user.department,
+        assetId: asset.id,
+        assetTitle: `${subFile.name} (来自：${asset.title.slice(0, 12)}...)`,
+        category: asset.category,
+        actionType: '文件夹内单下',
+        device: user.device
+      };
+      state.logs.unshift(newLog);
+      saveState();
+
+      const singleContent = [
+        `===================================================================`,
+        `  BrandHub · 飞书品牌资产中心 【文件夹内单文件下载凭证】`,
+        `===================================================================`,
+        `单独下载文件：${subFile.name}`,
+        `文件格式与规格：${subFile.format} | ${subFile.spec} | ${subFile.size}`,
+        `所属素材文件夹：${asset.title} (${asset.version})`,
+        `调用飞书员工：${user.name} (${user.department} · ${user.open_id})`,
+        `下载时间：${newLog.timestamp}`,
+        `===================================================================`
+      ].join('\n');
+
+      try {
+        const blob = new Blob([singleContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${subFile.name}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (e) {}
+
+      renderFolderModalFiles();
+      renderHomeView();
+      renderLibraryView();
+      if (state.currentView === 'analytics') renderAnalyticsView();
+      if (state.currentView === 'admin') renderAdminTable();
+
+      showToast(
+        `已单独下载子文件：「${subFile.name}」，后台已记录明细`,
+        'success'
+      );
+    }
+
+    // ==================== 7. 素材预览弹窗 & 真实下载触发与埋点记录 ====================
+    function openAssetDetail(assetId) {
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+      const modal = document.getElementById('modal-asset-detail');
+      const content = document.getElementById('modal-asset-detail-content');
+      if (!modal || !content) return;
+
+      const user = getCurrentUser();
+      const isLink = asset.deliveryType === 'link';
+
+      content.innerHTML = `
+        <div class="relative">
+          ${getAssetArtworkSVG(asset, true)}
+          <button type="button" onclick="closeAssetDetail()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-900/70 text-white hover:bg-slate-900 flex items-center justify-center">✕</button>
+          <div class="absolute bottom-4 left-5 flex flex-wrap items-center gap-2">
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-white text-slate-900 shadow">${asset.category}</span>
+            <span class="px-2.5 py-1 rounded-full text-xs font-mono font-semibold bg-slate-900/80 text-cyan-300 border border-white/15">${asset.version}</span>
+            ${asset.published
+              ? '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500 text-white">已上架开放</span>'
+              : '<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500 text-white">已下架 (仅后台可见)</span>'}
+          </div>
+        </div>
+
+        <div class="p-6 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div class="space-y-1.5">
+              <h2 class="text-lg sm:text-xl font-bold text-slate-900">${escapeHTML(asset.title)}</h2>
+              <p class="text-xs text-slate-500">维护负责人：${escapeHTML(asset.maintainer)} · 最近更新：${asset.updatedAt} · 累计被飞书员工调用 <strong>${asset.downloads}</strong> 次</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              ${canManageAssets() ? `<button type="button" onclick="closeAssetDetail();openEditAssetModal('${asset.id}')" class="px-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50">编辑素材</button>` : ''}
+              <button type="button" onclick="triggerAssetDownload('${asset.id}')" class="px-4 py-2.5 rounded-xl ${isLink ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-feishu-500 hover:bg-feishu-600'} text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center gap-1.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                <span>${isLink ? '打开外部协同链接并记录' : '立即下载素材包'}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-700 leading-relaxed">
+            <div class="font-bold text-slate-900 mb-1">资产说明与使用规范：</div>
+            ${escapeHTML(asset.desc)}
+            ${asset.externalUrl ? `<div class="mt-2 pt-2 border-t border-slate-200/70 text-feishu-600 font-mono truncate">关联云端地址：${escapeHTML(asset.externalUrl)}</div>` : ''}
+          </div>
+
+          <!-- 元数据规格网格 -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="text-slate-400">文件格式</div>
+              <div class="font-bold text-slate-800 mt-0.5">${escapeHTML(asset.format)}</div>
+            </div>
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="text-slate-400">包体大小</div>
+              <div class="font-bold text-slate-800 mt-0.5">${escapeHTML(asset.size)}</div>
+            </div>
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="text-slate-400">授权范围</div>
+              <div class="font-bold text-emerald-700 mt-0.5">飞书全员免登可用</div>
+            </div>
+            <div class="p-3 rounded-xl border border-slate-200">
+              <div class="text-slate-400">当前免登调用人</div>
+              <div class="font-bold text-slate-800 mt-0.5">${user.name} (${user.department})</div>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100">
+            <div class="flex flex-wrap gap-1.5">
+              ${(asset.tags || []).map(t => `<span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-xs">#${escapeHTML(t)}</span>`).join('')}
+            </div>
+            <span class="text-[11px] text-slate-400">下载后系统将自动记录您的飞书 OpenID 与时间</span>
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeAssetDetail() {
+      const modal = document.getElementById('modal-asset-detail');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function formatNowTimestamp() {
+      const d = new Date();
+      const pad = n => String(n).padStart(2, '0');
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    }
+
+    // 执行素材下载或外链访问，并写入后台下载审计日志
+    function triggerAssetDownload(assetId) {
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+      const user = getCurrentUser();
+
+      // 1. 累加下载次数
+      asset.downloads = (asset.downloads || 0) + 1;
+
+      // 2. 累加部门活跃计数
+      state.deptBaseCounts[user.department] = (state.deptBaseCounts[user.department] || 0) + 1;
+
+      // 3. 写入审计日志表首
+      const actionType = asset.deliveryType === 'link' ? '访问外链' : '文件下载';
+      const newLog = {
+        id: 'log_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        timestamp: formatNowTimestamp(),
+        userId: user.id,
+        userName: user.name,
+        openId: user.open_id,
+        department: user.department,
+        assetId: asset.id,
+        assetTitle: asset.title,
+        category: asset.category,
+        actionType: actionType,
+        device: user.device
+      };
+      state.logs.unshift(newLog);
+      saveState();
+
+      // 4. 生成真实可下载的品牌资产说明/矢量规范文件（让用户在浏览器中直接收到下载文件）
+      const fileContent = [
+        `===================================================================`,
+        `  BrandHub · 飞书品牌资产中心 官方授权下载凭证与资产包说明`,
+        `===================================================================`,
+        `素材名称：${asset.title}`,
+        `资产编号：${asset.id}`,
+        `所属分类：${asset.category}`,
+        `文件格式：${asset.format}`,
+        `当前版本：${asset.version}`,
+        `资产说明：${asset.desc}`,
+        asset.externalUrl ? `关联云文档/协同外链：${asset.externalUrl}` : '',
+        `-------------------------------------------------------------------`,
+        `【飞书免登调用审计记录】`,
+        `调用员工：${user.name} (${user.en_name})`,
+        `所属部门：${user.department} - ${user.jobTitle}`,
+        `飞书 OpenID：${user.open_id}`,
+        `下载时间：${newLog.timestamp}`,
+        `===================================================================`
+      ].filter(Boolean).join('\n');
+
+      try {
+        const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const safeName = asset.title.replace(/[^\w\u4e00-\u9fa5\-]/g, '_').slice(0, 32);
+        a.download = `${safeName}_${asset.version}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (e) {
+        // Fallback if blob download is blocked
+      }
+
+      // 5. 刷新界面与图表
+      renderHomeView();
+      renderLibraryView();
+      if (state.currentView === 'analytics') renderAnalyticsView();
+      if (state.currentView === 'admin') renderAdminTable();
+      if (!document.getElementById('modal-asset-detail').classList.contains('hidden')) {
+        openAssetDetail(assetId);
+      }
+
+      showToast(
+        `${user.name} (${user.department}) 已${actionType}「${asset.title.slice(0, 18)}...」，后台审计已记录`,
+        'success'
+      );
+    }
+
+    // ==================== 8. 批量下载篮逻辑 ====================
+    function toggleCartItem(assetId) {
+      if (state.cartIds[assetId]) {
+        delete state.cartIds[assetId];
+        showToast('已从批量下载篮移除', 'info');
+      } else {
+        state.cartIds[assetId] = true;
+        showToast('已加入批量下载篮', 'success');
+      }
+      updateCartBadge();
+      renderHomeView();
+      renderLibraryView();
+    }
+
+    function updateCartBadge() {
+      const count = Object.keys(state.cartIds).length;
+      const badge = document.getElementById('cart-badge');
+      if (badge) {
+        badge.textContent = String(count);
+        badge.classList.toggle('hidden', count === 0);
+      }
+    }
+
+    function openCartModal() {
+      const modal = document.getElementById('modal-cart');
+      const container = document.getElementById('cart-items-container');
+      if (!modal || !container) return;
+
+      const selectedAssets = state.assets.filter(a => state.cartIds[a.id]);
+      if (selectedAssets.length === 0) {
+        container.innerHTML = `<div class="py-10 text-center text-xs text-slate-400">下载篮为空，请先在首页或素材中心点击素材卡片右下角的「+」加入素材</div>`;
+      } else {
+        container.innerHTML = selectedAssets.map(a => `
+          <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/70">
+            <div class="min-w-0 pr-3">
+              <div class="text-xs font-bold text-slate-900 truncate">${escapeHTML(a.title)}</div>
+              <div class="text-[11px] text-slate-500">${a.category} · ${escapeHTML(a.format)} · ${escapeHTML(a.size)}</div>
+            </div>
+            <button type="button" onclick="toggleCartItem('${a.id}');openCartModal();" class="text-xs text-rose-600 hover:underline shrink-0">移除</button>
+          </div>
+        `).join('');
+      }
+      modal.classList.remove('hidden');
+    }
+
+    function closeCartModal() {
+      const modal = document.getElementById('modal-cart');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function clearCart() {
+      state.cartIds = {};
+      updateCartBadge();
+      openCartModal();
+      renderHomeView();
+      renderLibraryView();
+    }
+
+    function executeBatchDownload() {
+      const ids = Object.keys(state.cartIds);
+      if (ids.length === 0) {
+        showToast('请先添加需要批量下载的素材', 'warn');
+        return;
+      }
+      ids.forEach(id => triggerAssetDownload(id));
+      state.cartIds = {};
+      updateCartBadge();
+      closeCartModal();
+      showToast(`已完成 ${ids.length} 项素材批量打包下载并写入后台记录`, 'success');
+    }
+
+    // ==================== 9. 视觉化控制面板与图表分析 (ANALYTICS VIEW) ====================
+    function setAnalyticsRange(range) {
+      state.analyticsRange = range;
+      ['7d', '30d', 'all'].forEach(r => {
+        const btn = document.getElementById('range-' + r);
+        if (btn) {
+          btn.className = r === range
+            ? 'px-3 py-1 rounded-lg text-xs font-semibold bg-white text-feishu-600 shadow-sm'
+            : 'px-3 py-1 rounded-lg text-xs font-semibold text-slate-600';
+        }
+      });
+      renderAnalyticsView();
+    }
+
+    function renderAnalyticsView() {
+      const totalDownloads = state.assets.reduce((acc, a) => acc + (a.downloads || 0), 0);
+      const publishedCount = state.assets.filter(a => a.published).length;
+      const totalAssetsCount = state.assets.length;
+
+      // 计算各分类下载总量
+      const catTotals = {};
+      CATEGORIES.forEach(c => { catTotals[c.key] = 0; });
+      state.assets.forEach(a => {
+        catTotals[a.category] = (catTotals[a.category] || 0) + (a.downloads || 0);
+      });
+
+      let topCat = '模板';
+      let topCatVal = 0;
+      Object.keys(catTotals).forEach(k => {
+        if (catTotals[k] > topCatVal) {
+          topCatVal = catTotals[k];
+          topCat = k;
+        }
+      });
+      const topCatShare = totalDownloads > 0 ? ((topCatVal / totalDownloads) * 100).toFixed(1) : '0.0';
+
+      // 更新 4 个 KPI 卡片
+      const kpiTotal = document.getElementById('kpi-total-downloads');
+      const kpiTopCat = document.getElementById('kpi-top-category');
+      const kpiTopCatSub = document.getElementById('kpi-top-category-sub');
+      const kpiPubRatio = document.getElementById('kpi-publish-ratio');
+
+      if (kpiTotal) kpiTotal.textContent = totalDownloads.toLocaleString();
+      if (kpiTopCat) kpiTopCat.textContent = topCat;
+      if (kpiTopCatSub) kpiTopCatSub.innerHTML = `占总下载量 <strong class="text-feishu-600">${topCatShare}%</strong> · 共 ${topCatVal} 次调用`;
+      if (kpiPubRatio) kpiPubRatio.textContent = `${publishedCount} / ${totalAssetsCount} 在架`;
+
+      // 渲染热门素材 TOP 6 排行榜
+      const topListEl = document.getElementById('analytics-top-assets-list');
+      if (topListEl) {
+        const sortedAssets = [...state.assets].sort((a, b) => (b.downloads || 0) - (a.downloads || 0)).slice(0, 6);
+        const maxDl = sortedAssets[0]?.downloads || 1;
+        topListEl.innerHTML = sortedAssets.map((a, idx) => {
+          const pct = Math.max(12, Math.round(((a.downloads || 0) / maxDl) * 100));
+          return `
+            <div onclick="openAssetDetail('${a.id}')" class="p-3 rounded-xl border border-slate-100 hover:border-feishu-300 bg-slate-50/60 cursor-pointer transition space-y-1.5">
+              <div class="flex items-center justify-between gap-2 text-xs">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-5 h-5 rounded-md ${idx < 3 ? 'bg-feishu-500 text-white' : 'bg-slate-200 text-slate-700'} font-bold text-[11px] flex items-center justify-center shrink-0">${idx + 1}</span>
+                  <span class="font-semibold text-slate-800 truncate">${escapeHTML(a.title)}</span>
+                </div>
+                <span class="font-bold text-feishu-600 shrink-0">${a.downloads} 次</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full bg-slate-200/80 overflow-hidden">
+                <div class="h-full rounded-full bg-gradient-to-r from-feishu-500 to-cyan-400" style="width:${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      renderCharts(catTotals);
+      renderAuditLogTable();
+    }
+
+    function renderCharts(catTotals) {
+      if (typeof Chart === 'undefined') return;
+
+      // 1. 下载趋势图
+      const trendCanvas = document.getElementById('chart-download-trend');
+      if (trendCanvas) {
+        const extraRecent = Math.max(0, state.logs.length - INITIAL_LOGS.length);
+        const labels = state.analyticsRange === '7d'
+          ? ['10/15', '10/16', '10/17', '10/18', '10/19', '10/20', '10/21 (今日)']
+          : ['09/25', '09/30', '10/05', '10/10', '10/15', '10/18', '10/21 (今日)'];
+        const directData = state.analyticsRange === '7d'
+          ? [38, 45, 52, 49, 64, 71, 58 + extraRecent]
+          : [142, 168, 155, 196, 224, 248, 212 + extraRecent];
+        const linkData = state.analyticsRange === '7d'
+          ? [12, 15, 19, 18, 24, 29, 22 + Math.floor(extraRecent / 2)]
+          : [44, 52, 48, 63, 74, 82, 71 + Math.floor(extraRecent / 2)];
+
+        if (trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(trendCanvas.getContext('2d'), {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: '直接文件下载',
+                data: directData,
+                borderColor: '#3370FF',
+                backgroundColor: 'rgba(51, 112, 255, 0.12)',
+                fill: true,
+                tension: 0.35,
+                borderWidth: 2.5,
+                pointRadius: 4
+              },
+              {
+                label: '飞书云文档/Figma 外链调用',
+                data: linkData,
+                borderColor: '#06B6D4',
+                backgroundColor: 'rgba(6, 182, 212, 0.08)',
+                fill: true,
+                tension: 0.35,
+                borderWidth: 2,
+                pointRadius: 3
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+            },
+            scales: {
+              y: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+              x: { grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // 2. 五大分类环形占比图
+      const catCanvas = document.getElementById('chart-category-share');
+      if (catCanvas) {
+        if (categoryChartInstance) categoryChartInstance.destroy();
+        categoryChartInstance = new Chart(catCanvas.getContext('2d'), {
+          type: 'doughnut',
+          data: {
+            labels: CATEGORIES.map(c => c.key),
+            datasets: [{
+              data: CATEGORIES.map(c => catTotals[c.key] || 0),
+              backgroundColor: CATEGORIES.map(c => c.chartColor),
+              borderWidth: 2,
+              borderColor: '#ffffff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '64%',
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12, font: { size: 11 } } }
+            }
+          }
+        });
+      }
+
+      // 3. 飞书各部门下载活跃度横向柱状图
+      const deptCanvas = document.getElementById('chart-dept-activity');
+      if (deptCanvas) {
+        const deptEntries = Object.entries(state.deptBaseCounts).sort((a, b) => b[1] - a[1]);
+        if (deptChartInstance) deptChartInstance.destroy();
+        deptChartInstance = new Chart(deptCanvas.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: deptEntries.map(e => e[0]),
+            datasets: [{
+              label: '累计下载/调用次数',
+              data: deptEntries.map(e => e[1]),
+              backgroundColor: ['#3370FF', '#6366F1', '#06B6D4', '#10B981', '#F59E0B', '#64748B'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              x: { beginAtZero: true, grid: { color: '#F1F5F9' } },
+              y: { grid: { display: false } }
+            }
+          }
+        });
+      }
+    }
+
+    // 渲染实时审计日志表格
+    function renderAuditLogTable() {
+      const tbody = document.getElementById('audit-log-tbody');
+      if (!tbody) return;
+      const kw = (document.getElementById('log-search-input')?.value || '').trim().toLowerCase();
+      const catFilter = document.getElementById('log-category-filter')?.value || 'all';
+
+      const filteredLogs = state.logs.filter(l => {
+        if (catFilter !== 'all' && l.category !== catFilter) return false;
+        if (kw) {
+          const hay = `${l.userName} ${l.department} ${l.assetTitle} ${l.openId}`.toLowerCase();
+          if (!hay.includes(kw)) return false;
+        }
+        return true;
+      });
+
+      tbody.innerHTML = filteredLogs.slice(0, 30).map(l => `
+        <tr class="hover:bg-slate-50/90 transition">
+          <td class="py-2.5 px-3 font-mono text-[11px] text-slate-500 whitespace-nowrap">${escapeHTML(l.timestamp)}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            <div class="font-semibold text-slate-800">${escapeHTML(l.userName)}</div>
+            <div class="text-[10px] font-mono text-slate-400">${escapeHTML(l.openId)}</div>
+          </td>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            <span class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-medium">${escapeHTML(l.department)}</span>
+          </td>
+          <td class="py-2.5 px-3 font-medium text-slate-900 max-w-xs truncate">${escapeHTML(l.assetTitle)}</td>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold border ${getCategoryBadgeClass(l.category)}">${escapeHTML(l.category)}</span>
+          </td>
+          <td class="py-2.5 px-3 whitespace-nowrap">
+            <span class="px-2 py-0.5 rounded text-[11px] font-medium ${l.actionType === '访问外链' ? 'bg-indigo-50 text-indigo-700' : 'bg-emerald-50 text-emerald-700'}">${escapeHTML(l.actionType)}</span>
+          </td>
+          <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${escapeHTML(l.device)}</td>
+        </tr>
+      `).join('');
+    }
+
+    // 模拟团队并发下载 (+5 条记录)
+    function simulateTeamDownloads() {
+      const published = state.assets.filter(a => a.published);
+      if (published.length === 0) return;
+      const sampleUsers = Object.values(FEISHU_USERS);
+      for (let i = 0; i < 5; i++) {
+        const randAsset = published[Math.floor(Math.random() * published.length)];
+        const randUser = sampleUsers[Math.floor(Math.random() * sampleUsers.length)];
+        randAsset.downloads = (randAsset.downloads || 0) + 1;
+        state.deptBaseCounts[randUser.department] = (state.deptBaseCounts[randUser.department] || 0) + 1;
+        state.logs.unshift({
+          id: 'log_sim_' + Date.now() + '_' + i,
+          timestamp: formatNowTimestamp(),
+          userId: randUser.id,
+          userName: randUser.name,
+          openId: randUser.open_id,
+          department: randUser.department,
+          assetId: randAsset.id,
+          assetTitle: randAsset.title,
+          category: randAsset.category,
+          actionType: randAsset.deliveryType === 'link' ? '访问外链' : '文件下载',
+          device: randUser.device
+        });
+      }
+      saveState();
+      renderAnalyticsView();
+      renderHomeView();
+      showToast('已模拟 5 笔飞书跨部门员工下载行为，数据看板已实时更新', 'success');
+    }
+
+    // 导出下载审计日志为 CSV
+    function exportDownloadLogsCSV() {
+      const headers = ['下载时间', '飞书用户姓名', '飞书OpenID', '所属部门', '素材ID', '素材名称', '分类', '动作类型', '客户端'];
+      const rows = state.logs.map(l => [
+        l.timestamp,
+        l.userName,
+        l.openId,
+        l.department,
+        l.assetId,
+        `"${(l.assetTitle || '').replace(/"/g, '""')}"`,
+        l.category,
+        l.actionType,
+        l.device
+      ]);
+      const csvContent = '\uFEFF' + [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      try {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `飞书品牌素材中心_下载审计报表_${formatNowTimestamp().slice(0, 10)}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (e) {}
+      showToast('已导出全量下载审计 CSV 报表', 'success');
+    }
+
+    // ==================== 10. 后台素材库管理 (ADMIN CMS VIEW) ====================
+    function setAdminStatusFilter(status) {
+      state.adminStatusFilter = status;
+      ['all', 'published', 'unpublished'].forEach(s => {
+        const btn = document.getElementById('admin-filter-' + s);
+        if (btn) {
+          btn.className = s === status
+            ? 'px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-white'
+            : 'px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200';
+        }
+      });
+      renderAdminTable();
+    }
+
+    function renderAdminTable() {
+      const hasPerm = canManageAssets();
+      const banner = document.getElementById('admin-permission-banner');
+      const roleInd = document.getElementById('admin-role-indicator');
+      if (banner) banner.classList.toggle('hidden', hasPerm);
+      if (roleInd) {
+        const u = getCurrentUser();
+        roleInd.textContent = hasPerm ? `${u.roleLabel} · 完整管理权限` : `${u.roleLabel} · 只读预览模式`;
+        roleInd.className = hasPerm
+          ? 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200'
+          : 'px-2.5 py-0.5 text-xs font-semibold rounded-full bg-amber-100 text-amber-800 border border-amber-300';
+      }
+
+      // 更新状态计数
+      const pubCount = state.assets.filter(a => a.published).length;
+      const unpubCount = state.assets.filter(a => !a.published).length;
+      const cAll = document.getElementById('admin-count-all');
+      const cPub = document.getElementById('admin-count-published');
+      const cUnpub = document.getElementById('admin-count-unpublished');
+      if (cAll) cAll.textContent = String(state.assets.length);
+      if (cPub) cPub.textContent = String(pubCount);
+      if (cUnpub) cUnpub.textContent = String(unpubCount);
+
+      const catFilter = document.getElementById('admin-cat-filter')?.value || 'all';
+      const kw = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
+
+      const filtered = state.assets.filter(a => {
+        if (state.adminStatusFilter === 'published' && !a.published) return false;
+        if (state.adminStatusFilter === 'unpublished' && a.published) return false;
+        if (catFilter !== 'all' && a.category !== catFilter) return false;
+        if (kw) {
+          const hay = `${a.title} ${a.category} ${a.format} ${a.maintainer} ${(a.tags || []).join(' ')}`.toLowerCase();
+          if (!hay.includes(kw)) return false;
+        }
+        return true;
+      });
+
+      const tbody = document.getElementById('admin-table-tbody');
+      if (!tbody) return;
+
+      tbody.innerHTML = filtered.map(a => {
+        const checked = Boolean(state.adminSelectedIds[a.id]);
+        const isLink = a.deliveryType === 'link';
+        return `
+          <tr class="hover:bg-slate-50/90 transition ${!a.published ? 'bg-amber-50/20' : ''}">
+            <td class="py-3 px-4">
+              <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleAdminRowSelect('${a.id}', this.checked)" aria-label="选择素材" class="rounded border-slate-300 text-feishu-600 focus:ring-feishu-500" />
+            </td>
+            <td class="py-3 px-3 max-w-xs">
+              <div class="flex items-center gap-2.5">
+                <div onclick="openAssetDetail('${a.id}')" class="w-12 h-9 rounded-lg overflow-hidden shrink-0 cursor-pointer border border-slate-200">
+                  ${getAssetArtworkSVG(a, false).replace('h-40', 'h-9')}
+                </div>
+                <div class="min-w-0">
+                  <div onclick="openAssetDetail('${a.id}')" class="font-bold text-slate-900 hover:text-feishu-600 cursor-pointer truncate">${escapeHTML(a.title)}</div>
+                  <div class="text-[11px] text-slate-400 font-mono">${a.version} · ID: ${a.id}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              <span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${getCategoryBadgeClass(a.category)}">${escapeHTML(a.category)}</span>
+            </td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              <div class="font-medium text-slate-800 flex items-center gap-1">
+                <span>${isAssetFolder(a) ? `📁 文件夹 (${(a.folderFiles || []).length}项)` : escapeHTML(a.format)}</span>
+              </div>
+              <div class="text-[11px] ${isLink ? 'text-indigo-600' : 'text-slate-400'}">${isLink ? '外部云端链接' : escapeHTML(a.size)}</div>
+            </td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              <button type="button" onclick="toggleAssetPublish('${a.id}')" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition ${a.published ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200'}" title="点击切换上架/下架状态">
+                <span class="w-1.5 h-1.5 rounded-full ${a.published ? 'bg-emerald-500' : 'bg-amber-600'}"></span>
+                <span>${a.published ? '已上架' : '已下架'}</span>
+              </button>
+            </td>
+            <td class="py-3 px-3 whitespace-nowrap">
+              <button type="button" onclick="toggleAssetFeatured('${a.id}')" class="px-2.5 py-1 rounded-lg text-[11px] font-semibold transition ${a.featured ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
+                ${a.featured ? '★ 首页推荐中' : '☆ 设为推荐'}
+              </button>
+            </td>
+            <td class="py-3 px-3 font-bold text-slate-800 whitespace-nowrap">${a.downloads} 次</td>
+            <td class="py-3 px-3 whitespace-nowrap text-[11px] text-slate-500">
+              <div class="font-medium text-slate-700">${escapeHTML(a.maintainer)}</div>
+              <div>${a.updatedAt}</div>
+            </td>
+            <td class="py-3 px-4 text-right whitespace-nowrap">
+              <div class="inline-flex items-center gap-1.5">
+                <button type="button" onclick="toggleAssetPublish('${a.id}')" class="px-2.5 py-1 rounded-lg border text-xs font-semibold transition ${a.published ? 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100' : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'}">
+                  ${a.published ? '下架' : '上架'}
+                </button>
+                ${isAssetFolder(a) ? `<button type="button" onclick="openFolderModal('${a.id}')" class="px-2.5 py-1 rounded-lg border border-feishu-200 bg-feishu-50 hover:bg-feishu-100 text-feishu-700 text-xs font-medium">查看子文件</button>` : ''}
+                <button type="button" onclick="openEditAssetModal('${a.id}')" class="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium">编辑/管理</button>
+                <button type="button" onclick="deleteSingleAsset('${a.id}')" class="px-2 py-1 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-medium">删除</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      updateAdminSelectedCountUI();
+    }
+
+    function requireMaintainerPermission() {
+      if (!canManageAssets()) {
+        showToast('权限不足：当前为普通员工视角，请先在右上角切换为「管理员」或「内容维护员」', 'warn');
+        return false;
+      }
+      return true;
+    }
+
+    function toggleAssetPublish(assetId) {
+      if (!requireMaintainerPermission()) return;
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+      asset.published = !asset.published;
+      asset.updatedAt = formatNowTimestamp().slice(0, 10);
+      asset.maintainer = getCurrentUser().name;
+      saveState();
+      updateUserHeaderUI();
+      renderAdminTable();
+      renderHomeView();
+      renderLibraryView();
+      showToast(
+        asset.published
+          ? `已上架「${asset.title.slice(0, 16)}...」，全员现在可在前台查找并下载`
+          : `已下架「${asset.title.slice(0, 16)}...」，前台已隐藏该素材`,
+        asset.published ? 'success' : 'info'
+      );
+    }
+
+    function toggleAssetFeatured(assetId) {
+      if (!requireMaintainerPermission()) return;
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+      asset.featured = !asset.featured;
+      saveState();
+      renderAdminTable();
+      renderHomeView();
+      showToast(asset.featured ? '已设为首页重点推荐' : '已取消首页推荐', 'info');
+    }
+
+    function deleteSingleAsset(assetId) {
+      if (!requireMaintainerPermission()) return;
+      const idx = state.assets.findIndex(a => a.id === assetId);
+      if (idx === -1) return;
+      const removed = state.assets.splice(idx, 1)[0];
+      delete state.adminSelectedIds[assetId];
+      delete state.cartIds[assetId];
+      saveState();
+      updateUserHeaderUI();
+      renderAdminTable();
+      renderHomeView();
+      renderLibraryView();
+      showToast(`已从素材库彻底删除「${removed.title.slice(0, 15)}...」`, 'info');
+    }
+
+    function toggleAdminRowSelect(assetId, checked) {
+      if (checked) {
+        state.adminSelectedIds[assetId] = true;
+      } else {
+        delete state.adminSelectedIds[assetId];
+      }
+      updateAdminSelectedCountUI();
+    }
+
+    function toggleAdminSelectAll(checked) {
+      if (checked) {
+        state.assets.forEach(a => { state.adminSelectedIds[a.id] = true; });
+      } else {
+        state.adminSelectedIds = {};
+      }
+      renderAdminTable();
+    }
+
+    function updateAdminSelectedCountUI() {
+      const count = Object.keys(state.adminSelectedIds).length;
+      const label = document.getElementById('admin-selected-count');
+      if (label) label.textContent = `已选 ${count} 项`;
+    }
+
+    function batchUpdateStatus(targetStatus) {
+      if (!requireMaintainerPermission()) return;
+      const ids = Object.keys(state.adminSelectedIds);
+      if (ids.length === 0) {
+        showToast('请先在表格左侧勾选需要批量操作的素材', 'warn');
+        return;
+      }
+      const pub = targetStatus === 'published';
+      state.assets.forEach(a => {
+        if (state.adminSelectedIds[a.id]) {
+          a.published = pub;
+          a.updatedAt = formatNowTimestamp().slice(0, 10);
+        }
+      });
+      state.adminSelectedIds = {};
+      saveState();
+      updateUserHeaderUI();
+      renderAdminTable();
+      renderHomeView();
+      renderLibraryView();
+      showToast(`已批量${pub ? '上架' : '下架'} ${ids.length} 项品牌素材`, 'success');
+    }
+
+    function batchDeleteSelected() {
+      if (!requireMaintainerPermission()) return;
+      const ids = Object.keys(state.adminSelectedIds);
+      if (ids.length === 0) {
+        showToast('请先勾选需要删除的素材', 'warn');
+        return;
+      }
+      state.assets = state.assets.filter(a => !state.adminSelectedIds[a.id]);
+      state.adminSelectedIds = {};
+      saveState();
+      updateUserHeaderUI();
+      renderAdminTable();
+      renderHomeView();
+      renderLibraryView();
+      showToast(`已批量删除 ${ids.length} 项素材`, 'info');
+    }
+
+    // ==================== 11. 上传/新建文件夹/链接/编辑素材表单 Modal ====================
+    function setFormDeliveryMode(mode) {
+      state.formDeliveryMode = mode;
+      const fdBtn = document.getElementById('mode-btn-folder');
+      const upBtn = document.getElementById('mode-btn-upload');
+      const lkBtn = document.getElementById('mode-btn-link');
+      const upBox = document.getElementById('form-upload-box');
+      const fdBox = document.getElementById('form-folder-files-box');
+      const lkBox = document.getElementById('form-link-box');
+
+      const activeCls = 'py-2.5 px-3 rounded-xl border-2 border-feishu-500 bg-feishu-50 text-feishu-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition';
+      const inactiveCls = 'py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-slate-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition';
+
+      if (fdBtn) fdBtn.className = mode === 'folder' ? activeCls : inactiveCls;
+      if (upBtn) upBtn.className = mode === 'download' ? activeCls : inactiveCls;
+      if (lkBtn) lkBtn.className = mode === 'link' ? activeCls : inactiveCls;
+
+      if (upBox) upBox.classList.toggle('hidden', mode === 'link');
+      if (fdBox) fdBox.classList.toggle('hidden', mode !== 'folder');
+      if (lkBox) lkBox.classList.toggle('hidden', mode !== 'link');
+
+      if (mode === 'folder' && state.draftFolderFiles.length === 0) {
+        state.draftFolderFiles = [
+          { id: 'draft_1', name: '01_标准主视觉横版源文件.svg', format: 'SVG', spec: '矢量无限缩放', size: '3.2 MB', downloads: 0 },
+          { id: 'draft_2', name: '02_标准主视觉竖版延展稿.png', format: 'PNG', spec: '3840×2160 px', size: '6.8 MB', downloads: 0 }
+        ];
+      }
+      renderDraftFolderFilesList();
+    }
+
+    function renderDraftFolderFilesList() {
+      const listEl = document.getElementById('form-folder-files-list');
+      if (!listEl) return;
+      if (state.draftFolderFiles.length === 0) {
+        listEl.innerHTML = `<div class="text-center py-4 text-xs text-slate-400">暂无子文件，请点击上方「+ 添加子文件条目」或通过文件选择器批量导入</div>`;
+        return;
+      }
+      listEl.innerHTML = state.draftFolderFiles.map((f, idx) => `
+        <div class="flex items-center gap-2 bg-white p-2 rounded-lg border border-slate-200">
+          <span class="text-[11px] font-mono text-slate-400 w-5 text-center">${idx + 1}</span>
+          <input type="text" value="${escapeHTML(f.name)}" oninput="updateDraftSubFile(${idx}, 'name', this.value)" placeholder="子文件名称 (如 01_横版Logo.svg)" class="flex-1 px-2.5 py-1 rounded border border-slate-200 text-xs focus:outline-none focus:border-feishu-500" />
+          <input type="text" value="${escapeHTML(f.format)}" oninput="updateDraftSubFile(${idx}, 'format', this.value)" placeholder="格式" class="w-16 px-2 py-1 rounded border border-slate-200 text-xs font-mono text-center" />
+          <input type="text" value="${escapeHTML(f.size)}" oninput="updateDraftSubFile(${idx}, 'size', this.value)" placeholder="大小" class="w-20 px-2 py-1 rounded border border-slate-200 text-xs text-center" />
+          <button type="button" onclick="removeDraftSubFile(${idx})" class="p-1 text-slate-400 hover:text-rose-600 text-xs" title="移除该子文件">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function updateDraftSubFile(idx, field, val) {
+      if (!state.draftFolderFiles[idx]) return;
+      state.draftFolderFiles[idx][field] = val;
+    }
+
+    function addDraftFolderSubFile() {
+      const nextNum = String(state.draftFolderFiles.length + 1).padStart(2, '0');
+      state.draftFolderFiles.push({
+        id: 'sub_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+        name: `${nextNum}_新增同类子素材文件.png`,
+        format: 'PNG',
+        spec: '高清标准版',
+        size: '4.5 MB',
+        downloads: 0
+      });
+      renderDraftFolderFilesList();
+    }
+
+    function removeDraftSubFile(idx) {
+      state.draftFolderFiles.splice(idx, 1);
+      renderDraftFolderFilesList();
+    }
+
+    function handleLocalFileSelect(input) {
+      const files = input.files;
+      if (!files || files.length === 0) return;
+      const titleInput = document.getElementById('form-title');
+      const formatInput = document.getElementById('form-format');
+      const sizeInput = document.getElementById('form-size');
+      const infoEl = document.getElementById('form-file-Picked-info');
+
+      if (files.length > 1 || state.formDeliveryMode === 'folder') {
+        setFormDeliveryMode('folder');
+        let totalBytes = 0;
+        const imported = Array.from(files).map((f, i) => {
+          totalBytes += f.size;
+          const ext = f.name.includes('.') ? f.name.split('.').pop().toUpperCase() : 'FILE';
+          const sz = (f.size / (1024 * 1024)).toFixed(2) + ' MB';
+          return {
+            id: 'sub_local_' + Date.now() + '_' + i,
+            name: f.name,
+            format: ext,
+            spec: '本地上传源文件',
+            size: sz,
+            downloads: 0
+          };
+        });
+        state.draftFolderFiles = imported;
+        renderDraftFolderFilesList();
+        const totalMB = (totalBytes / (1024 * 1024)).toFixed(2) + ' MB';
+        if (titleInput && !titleInput.value) {
+          titleInput.value = files[0].name.replace(/\.[^/.]+$/, '') + ' 素材文件夹';
+        }
+        if (formatInput) formatInput.value = `文件夹 (含 ${files.length} 个文件)`;
+        if (sizeInput) sizeInput.value = totalMB;
+        if (infoEl) infoEl.textContent = `已导入 ${files.length} 个本地文件至当前素材文件夹 (共 ${totalMB})`;
+      } else {
+        const file = files[0];
+        const ext = file.name.includes('.') ? file.name.split('.').pop().toUpperCase() : 'FILE';
+        const sizeMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        if (titleInput && !titleInput.value) {
+          titleInput.value = file.name.replace(/\.[^/.]+$/, '');
+        }
+        if (formatInput) formatInput.value = ext;
+        if (sizeInput) sizeInput.value = sizeMB;
+        if (infoEl) infoEl.textContent = `已读取本地文件：${file.name} (${sizeMB})`;
+      }
+    }
+
+    function openAssetModal(defaultMode = 'folder') {
+      if (!requireMaintainerPermission()) return;
+      document.getElementById('form-asset-id').value = '';
+      document.getElementById('asset-form-title').textContent = '新建素材文件夹 / 上传单文件 / 关联外链';
+      document.getElementById('form-title').value = '';
+      document.getElementById('form-category').value = '设计素材';
+      document.getElementById('form-format').value = defaultMode === 'folder' ? '文件夹 (SVG / PNG / PSD)' : 'SVG / PNG';
+      document.getElementById('form-size').value = '24.0 MB';
+      document.getElementById('form-version').value = 'v1.0';
+      document.getElementById('form-external-url').value = '';
+      document.getElementById('form-tags').value = '2026品牌, 官方素材文件夹';
+      document.getElementById('form-desc').value = '';
+      document.getElementById('form-published').checked = true;
+      document.getElementById('form-featured').checked = true;
+      state.draftFolderFiles = [
+        { id: 'sub_init_1', name: '01_主视觉标准横版源文件.svg', format: 'SVG', spec: '矢量无限缩放', size: '4.2 MB', downloads: 0 },
+        { id: 'sub_init_2', name: '02_主视觉高清透明底渲染图.png', format: 'PNG', spec: '3840×2160 px', size: '9.8 MB', downloads: 0 },
+        { id: 'sub_init_3', name: '03_配套延展尺寸规范说明.pdf', format: 'PDF', spec: 'A4 规范卡', size: '3.1 MB', downloads: 0 }
+      ];
+      setFormDeliveryMode(defaultMode === 'link' ? 'link' : (defaultMode === 'upload' ? 'download' : 'folder'));
+
+      document.getElementById('modal-asset-form').classList.remove('hidden');
+    }
+
+    function openEditAssetModal(assetId) {
+      if (!requireMaintainerPermission()) return;
+      const asset = state.assets.find(a => a.id === assetId);
+      if (!asset) return;
+
+      document.getElementById('form-asset-id').value = asset.id;
+      document.getElementById('asset-form-title').textContent = '编辑品牌素材 / 管理文件夹子素材';
+      document.getElementById('form-title').value = asset.title;
+      document.getElementById('form-category').value = asset.category;
+      document.getElementById('form-format').value = asset.format;
+      document.getElementById('form-size').value = asset.size;
+      document.getElementById('form-version').value = asset.version;
+      document.getElementById('form-external-url').value = asset.externalUrl || '';
+      document.getElementById('form-tags').value = (asset.tags || []).join(', ');
+      document.getElementById('form-desc').value = asset.desc;
+      document.getElementById('form-published').checked = Boolean(asset.published);
+      document.getElementById('form-featured').checked = Boolean(asset.featured);
+
+      state.draftFolderFiles = JSON.parse(JSON.stringify(asset.folderFiles || []));
+      const mode = isAssetFolder(asset) ? 'folder' : (asset.deliveryType === 'link' ? 'link' : 'download');
+      setFormDeliveryMode(mode);
+
+      document.getElementById('modal-asset-form').classList.remove('hidden');
+    }
+
+    function closeAssetModal() {
+      document.getElementById('modal-asset-form').classList.add('hidden');
+    }
+
+    function handleAssetFormSubmit(e) {
+      e.preventDefault();
+      if (!requireMaintainerPermission()) return;
+
+      const existingId = document.getElementById('form-asset-id').value;
+      const title = document.getElementById('form-title').value.trim();
+      const category = document.getElementById('form-category').value;
+      const isFolder = state.formDeliveryMode === 'folder';
+      const cleanSubFiles = isFolder
+        ? state.draftFolderFiles.filter(f => f.name && f.name.trim())
+        : [];
+      const format = document.getElementById('form-format').value.trim() || (isFolder ? `文件夹 (含 ${cleanSubFiles.length} 个文件)` : 'ZIP');
+      const size = document.getElementById('form-size').value.trim() || (state.formDeliveryMode === 'link' ? '在线云端' : '15.0 MB');
+      const version = document.getElementById('form-version').value.trim() || 'v1.0';
+      const externalUrl = document.getElementById('form-external-url').value.trim();
+      const tags = document.getElementById('form-tags').value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+      const desc = document.getElementById('form-desc').value.trim() || '官方认证品牌视觉与设计规范资产，支持飞书免登直接调用。';
+      const published = document.getElementById('form-published').checked;
+      const featured = document.getElementById('form-featured').checked;
+      const user = getCurrentUser();
+
+      if (existingId) {
+        const target = state.assets.find(a => a.id === existingId);
+        if (target) {
+          target.title = title;
+          target.category = category;
+          target.format = format;
+          target.size = size;
+          target.version = version;
+          target.deliveryType = state.formDeliveryMode;
+          target.isFolder = isFolder;
+          target.folderFiles = cleanSubFiles;
+          target.externalUrl = externalUrl;
+          target.tags = tags;
+          target.desc = desc;
+          target.published = published;
+          target.featured = featured;
+          target.updatedAt = formatNowTimestamp().slice(0, 10);
+          target.maintainer = user.name;
+        }
+        showToast(`已更新${isFolder ? '素材文件夹' : '素材'}「${title.slice(0, 16)}...」`, 'success');
+      } else {
+        const newAsset = {
+          id: 'ast_' + Date.now().toString(36),
+          title,
+          category,
+          format,
+          size,
+          version,
+          deliveryType: state.formDeliveryMode,
+          isFolder: isFolder,
+          folderFiles: cleanSubFiles,
+          externalUrl,
+          published,
+          featured,
+          downloads: 1,
+          updatedAt: formatNowTimestamp().slice(0, 10),
+          maintainer: user.name,
+          theme: 'blue',
+          tags: tags.length ? tags : [category, '2026新品'],
+          desc
+        };
+        state.assets.unshift(newAsset);
+        showToast(`新${isFolder ? '素材文件夹' : '素材'}「${title.slice(0, 16)}...」已${published ? '上架发布' : '保存至后台暂存'}`, 'success');
+      }
+
+      saveState();
+      closeAssetModal();
+      updateUserHeaderUI();
+      renderHomeView();
+      renderLibraryView();
+      renderAdminTable();
+    }
+
+    // ==================== 12. 飞书免登个人信息 Modal & 架构说明 Modal ====================
+    function openFeishuProfileModal() {
+      const u = getCurrentUser();
+      const userLogs = state.logs.filter(l => l.openId === u.open_id || l.userName === u.name);
+      const body = document.getElementById('feishu-profile-modal-body');
+      const modal = document.getElementById('modal-feishu-profile');
+      if (!body || !modal) return;
+
+      body.innerHTML = `
+        <div class="flex items-center gap-3.5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-12 h-12 rounded-2xl ${u.avatarBg} text-white text-lg font-bold flex items-center justify-center shrink-0">${u.avatarText}</div>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-900 text-base">${u.name} (${u.en_name})</span>
+              <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${u.roleBadgeClass}">${u.roleLabel}</span>
+            </div>
+            <div class="text-xs text-slate-500 mt-0.5">${u.department} · ${u.jobTitle}</div>
+            <div class="text-[11px] font-mono text-slate-400 mt-0.5">OpenID: ${u.open_id}</div>
+          </div>
+        </div>
+
+        <div class="rounded-xl bg-slate-900 text-slate-100 p-3.5 font-mono text-[11px] space-y-1">
+          <div class="text-emerald-400">// 飞书免登接口返回载荷 (/open-apis/authen/v1/user_info)</div>
+          <div>{ "code": 0, "msg": "success", "data": {</div>
+          <div class="pl-3">"name": "${u.name}", "open_id": "${u.open_id}",</div>
+          <div class="pl-3">"department_name": "${u.department}", "role": "${u.role}"</div>
+          <div>}}</div>
+        </div>
+
+        <div class="space-y-2">
+          <div class="text-xs font-bold text-slate-800">当前飞书账号最近下载记录 (${userLogs.length} 条)</div>
+          <div class="max-h-44 overflow-y-auto custom-scrollbar divide-y divide-slate-100 border border-slate-200 rounded-xl">
+            ${userLogs.length === 0
+              ? '<div class="p-4 text-center text-xs text-slate-400">暂无个人下载记录</div>'
+              : userLogs.slice(0, 8).map(l => `
+                <div class="p-2.5 text-xs flex items-center justify-between gap-2">
+                  <span class="font-medium text-slate-800 truncate">${escapeHTML(l.assetTitle)}</span>
+                  <span class="text-[11px] text-slate-400 font-mono shrink-0">${l.timestamp.slice(5, 16)}</span>
+                </div>
+              `).join('')}
+          </div>
+        </div>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function closeFeishuProfileModal() {
+      document.getElementById('modal-feishu-profile').classList.add('hidden');
+    }
+
+    function openFeishuArchitectureModal() {
+      document.getElementById('modal-feishu-arch').classList.remove('hidden');
+    }
+
+    function closeFeishuArchitectureModal() {
+      document.getElementById('modal-feishu-arch').classList.add('hidden');
+    }
+
+    // ==================== 13. 辅助工具：色值复制、HTML转义、Toast 提示 ====================
+    function copyColorToken(hex, label) {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(hex);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = hex;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = hex;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+      showToast(`已复制${label}色值：${hex}`, 'success');
+    }
+
+    function escapeHTML(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      const colorMap = {
+        success: 'bg-slate-900 text-white border-emerald-500/40',
+        info: 'bg-slate-900 text-white border-feishu-500/40',
+        warn: 'bg-amber-600 text-white border-amber-300'
+      };
+      el.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl border shadow-lg text-xs font-medium transition-all duration-300 ${colorMap[type] || colorMap.info}`;
+      el.innerHTML = `
+        <span class="w-2 h-2 rounded-full ${type === 'warn' ? 'bg-white' : 'bg-emerald-400'} shrink-0"></span>
+        <span class="flex-1 leading-snug">${escapeHTML(message)}</span>
+      `;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(6px)';
+        setTimeout(() => {
+          if (el.parentNode) el.parentNode.removeChild(el);
+        }, 250);
+      }, 3200);
+    }
+
+    // 初始化启动
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      updateUserHeaderUI();
+      updateCartBadge();
+      renderHomeView();
+      renderLibraryView();
+      renderAdminTable();
+    });
+  </script>
+</body>
+</html>
